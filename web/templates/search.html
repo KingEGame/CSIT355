@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Search Courses</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="GET" action="{{ url_for('search') }}" class="d-flex">
+            <input type="text" name="q" class="form-control me-2" placeholder="Search by course name or code" value="{{ search_term }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+{% if search_term %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h4>Search Results for "{{ search_term }}"</h4>
+    </div>
+</div>
+{% endif %}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Semester</th>
+                <th>Days</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>Professor</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course[0] }}</td>
+                <td>{{ course[1] }}</td>
+                <td>{{ course[2] }}</td>
+                <td>{{ course[4] }}</td>
+                <td>{{ course[5].strftime('%H:%M') }}-{{ course[6].strftime('%H:%M') }}</td>
+                <td>{{ course[8] }} {{ course[7] }}</td>
+                <td>{{ course[9] }} {{ course[10] }}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary enroll-btn" 
+                            data-schedule-id="{{ course[3] }}"
+                            data-course-name="{{ course[1] }}">
+                        Enroll
+                    </button>
+                    <a href="{{ url_for('prerequisites', course_id=course[0]) }}" 
+                       class="btn btn-sm btn-info">
+                        Prerequisites
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Enrollment Modal -->
+<div class="modal fade" id="enrollModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Enrollment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to enroll in <span id="courseName"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmEnroll">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    let currentScheduleId = null;
+    const enrollModal = new bootstrap.Modal(document.getElementById('enrollModal'));
+
+    $('.enroll-btn').click(function() {
+        currentScheduleId = $(this).data('schedule-id');
+        $('#courseName').text($(this).data('course-name'));
+        enrollModal.show();
+    });
+
+    $('#confirmEnroll').click(function() {
+        if (currentScheduleId) {
+            $.post('{{ url_for("enroll") }}', {
+                schedule_id: currentScheduleId
+            })
+            .done(function(response) {
+                if (response.success) {
+                    alert('Successfully enrolled in the course!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            })
+            .fail(function() {
+                alert('An error occurred while enrolling in the course.');
+            });
+        }
+        enrollModal.hide();
+    });
+});
+</script>
+{% endblock %} 

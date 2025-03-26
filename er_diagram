@@ -1,0 +1,62 @@
+// University Course Management System ER Diagram
+digraph {
+	rankdir=LR
+	Student [label="Student
+    student_id (PK)
+    first_name
+    last_name
+    email
+    date_of_birth
+    major
+    enrollment_date
+    status"]
+	Professor [label="Professor
+    professor_id (PK)
+    first_name
+    last_name
+    email
+    department
+    hire_date
+    status"]
+	Course [label="Course
+    course_id (PK)
+    course_code
+    course_name
+    description
+    credits
+    department
+    level
+    status"]
+	Schedule [label="Schedule
+    schedule_id (PK)
+    course_id (FK)
+    semester
+    academic_year
+    meeting_days
+    start_time
+    end_time
+    room_number
+    building
+    max_capacity"]
+	Teaching [label="Teaching
+    teaching_id (PK)
+    professor_id (FK)
+    schedule_id (FK)"]
+	Enrollment [label="Enrollment
+    enrollment_id (PK)
+    student_id (FK)
+    schedule_id (FK)
+    enrollment_date
+    grade
+    status"]
+	Prerequisites [label="Prerequisites
+    course_id (FK)
+    prerequisite_id (FK)"]
+	Student -> Enrollment [label="enrolls in"]
+	Course -> Schedule [label=has]
+	Course -> Prerequisites [label=has]
+	Course -> Prerequisites [label="is prerequisite for"]
+	Professor -> Teaching [label=teaches]
+	Schedule -> Teaching [label="is taught in"]
+	Schedule -> Enrollment [label="is enrolled in"]
+}
