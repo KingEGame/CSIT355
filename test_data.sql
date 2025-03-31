@@ -24,35 +24,35 @@ INSERT INTO Professor (professor_id, first_name, last_name, email, department, h
                                                                                                       ('P009', 'Sophia', 'Martinez', 'sophia.m@university.edu', 'Physics', '2022-01-05', 'active'),
                                                                                                       ('P010', 'William', 'Lee', 'william.l@university.edu', 'Computer Science', '2021-08-15', 'active');
 
--- Insert sample courses with all required fields
+-- Insert sample courses
 INSERT INTO Course (course_id, course_code, course_name, description, credits, department, level) VALUES
-('CSE102', 'CSE102', 'Data Structures', 'Fundamental data structures and algorithms', 3, 'Computer Science', 'undergraduate'),
-('CSE201', 'CSE201', 'Database Systems', 'Design and implementation of database systems', 3, 'Computer Science', 'undergraduate'),
-('CSE202', 'CSE202', 'Web Development', 'Modern web development technologies and frameworks', 3, 'Computer Science', 'undergraduate'),
-('MTH101', 'MTH101', 'Calculus I', 'Introduction to differential and integral calculus', 4, 'Mathematics', 'undergraduate'),
-('MTH102', 'MTH102', 'Linear Algebra', 'Study of linear equations and vector spaces', 3, 'Mathematics', 'undergraduate'),
-('PHY101', 'PHY101', 'Classical Mechanics', 'Basic principles of classical mechanics', 4, 'Physics', 'undergraduate'),
-('PHY102', 'PHY102', 'Electromagnetism', 'Study of electric and magnetic fields', 4, 'Physics', 'undergraduate'),
-('CSE301', 'CSE301', 'Software Engineering', 'Software development methodologies and practices', 3, 'Computer Science', 'undergraduate'),
-('CSE302', 'CSE302', 'Computer Networks', 'Network protocols and architecture', 3, 'Computer Science', 'undergraduate');
+                                                                                                      ('CSE102', 'CSE102', 'Data Structures', 'Fundamental data structures and algorithms', 3, 'Computer Science', 'undergraduate'),
+                                                                                                      ('CSE201', 'CSE201', 'Database Systems', 'Design and implementation of database systems', 3, 'Computer Science', 'undergraduate'),
+                                                                                                      ('CSE202', 'CSE202', 'Web Development', 'Modern web development technologies and frameworks', 3, 'Computer Science', 'undergraduate'),
+                                                                                                      ('MTH101', 'MTH101', 'Calculus I', 'Introduction to differential and integral calculus', 4, 'Mathematics', 'undergraduate'),
+                                                                                                      ('MTH102', 'MTH102', 'Linear Algebra', 'Study of linear equations and vector spaces', 3, 'Mathematics', 'undergraduate'),
+                                                                                                      ('PHY101', 'PHY101', 'Classical Mechanics', 'Basic principles of classical mechanics', 4, 'Physics', 'undergraduate'),
+                                                                                                      ('PHY102', 'PHY102', 'Electromagnetism', 'Study of electric and magnetic fields', 4, 'Physics', 'undergraduate'),
+                                                                                                      ('CSE301', 'CSE301', 'Software Engineering', 'Software development methodologies and practices', 3, 'Computer Science', 'undergraduate'),
+                                                                                                      ('CSE302', 'CSE302', 'Computer Networks', 'Network protocols and architecture', 3, 'Computer Science', 'undergraduate');
 
--- Insert prerequisites
+-- Insert course prerequisites
 INSERT INTO Prerequisites (course_id, prerequisite_id) VALUES
-('CSE102', 'CSE101'),
-('CSE201', 'CSE102'),
-('CSE202', 'CSE101'),
-('MTH102', 'MTH101'),
-('PHY102', 'PHY101'),
-('CSE301', 'CSE201'),
-('CSE302', 'CSE201');
+                                                           ('CSE102', 'CSE101'),
+                                                           ('CSE201', 'CSE102'),
+                                                           ('CSE202', 'CSE101'),
+                                                           ('MTH102', 'MTH101'),
+                                                           ('PHY102', 'PHY101'),
+                                                           ('CSE301', 'CSE201'),
+                                                           ('CSE302', 'CSE201');
 
 -- Insert sample schedules
 INSERT INTO Schedule (schedule_id, course_id, semester, academic_year, meeting_days, start_time, end_time, room_number, building) VALUES
-('SCH001', 'CSE101', 'Fall', 2024, 'MWF', '09:00:00', '10:30:00', '101', 'Computer Science Building'),
-('SCH002', 'CSE232', 'Fall', 2024, 'TR', '14:00:00', '15:30:00', '102', 'Computer Science Building'),
-('SCH003', 'CSE331', 'Fall', 2024, 'MWF', '11:00:00', '12:30:00', '201', 'Computer Science Building'),
-('SCH004', 'CSE435', 'Fall', 2024, 'TR', '09:00:00', '10:30:00', '301', 'Computer Science Building'),
-('SCH005', 'CSE480', 'Fall', 2024, 'MWF', '14:00:00', '15:30:00', '401', 'Computer Science Building');
+                                                                                                                                      ('SCH001', 'CSE101', 'Fall', 2024, 'MWF', '09:00:00', '10:30:00', '101', 'Computer Science Building'),
+                                                                                                                                      ('SCH002', 'CSE232', 'Fall', 2024, 'TR', '14:00:00', '15:30:00', '102', 'Computer Science Building'),
+                                                                                                                                      ('SCH003', 'CSE331', 'Fall', 2024, 'MWF', '11:00:00', '12:30:00', '201', 'Computer Science Building'),
+                                                                                                                                      ('SCH004', 'CSE435', 'Fall', 2024, 'TR', '09:00:00', '10:30:00', '301', 'Computer Science Building'),
+                                                                                                                                      ('SCH005', 'CSE480', 'Fall', 2024, 'MWF', '14:00:00', '15:30:00', '401', 'Computer Science Building');
 
 -- Insert teaching assignments
 INSERT INTO Teaching (teaching_id, professor_id, schedule_id) VALUES

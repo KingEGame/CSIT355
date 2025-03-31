@@ -1,5 +1,38 @@
+import argparse
 from sql_connection import DatabaseConnection
 from datetime import datetime
+import sys
+
+def init_database():
+    """Initialize the database schema."""
+    db = DatabaseConnection()
+    try:
+        with open('schema.sql', 'r') as f:
+            schema = f.read()
+            db.execute_script(schema)
+        print("Successfully initialized database.")
+    except Exception as e:
+        print(f"Error initializing database: {e}")
+    finally:
+        db.close()
+
+def load_test_data():
+    """Load test data into the database."""
+    db = DatabaseConnection()
+    try:
+        with open('test_data.sql', 'r') as f:
+            test_data = f.read()
+            db.execute_script(test_data)
+        print("Successfully loaded test data into database.")
+    except Exception as e:
+        print(f"Error loading test data: {e}")
+    finally:
+        db.close()
+
+def reset_database():
+    """Reset the database by reinitializing the schema."""
+    init_database()
+    print("Successfully reset database.")
 
 def print_menu():
     print("\nMSU Course Management System")
@@ -44,6 +77,30 @@ def display_courses(courses):
     print("-" * 100)
 
 def main():
+    parser = argparse.ArgumentParser(description='MSU Course Management System')
+    parser.add_argument('--debug', action='store_true',
+                      help='Enable debug mode')
+    parser.add_argument('--init-db', action='store_true',
+                      help='Initialize database schema')
+    parser.add_argument('--reset-db', action='store_true',
+                      help='Reset database')
+    parser.add_argument('--load-test-data', action='store_true',
+                      help='Load test data into database')
+
+    args = parser.parse_args()
+
+    # Handle database operations
+    if args.init_db:
+        init_database()
+        return
+    elif args.reset_db:
+        reset_database()
+        return
+    elif args.load_test_data:
+        load_test_data()
+        return
+
+    # Initialize database connection
     db = DatabaseConnection()
     current_student = None
 
@@ -126,7 +183,13 @@ def main():
                 print("\nInvalid choice. Please try again.")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        if args.debug:
+            import traceback
+            print(f"An error occurred: {e}")
+            print("Traceback:")
+            traceback.print_exc()
+        else:
+            print(f"An error occurred: {e}")
     finally:
         db.close()
 

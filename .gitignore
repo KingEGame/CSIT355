@@ -1,0 +1,47 @@
+# Default ignored files
+/shelf/
+.workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+.dataSources.local.xml
+
+# Folders to ignore
+/flask_session/
+/.idea/
+/env/
+/__pycache__/
+/db/
+
+# Environment variables
+.env
+.env.example
+
+# IDE specific files
+*.iml
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Other files to ignore
+*.bak
+*.swp
