@@ -6,7 +6,6 @@ load_dotenv(dotenv_path='D:/MSU/Database/Project/.env')
 
 class Config:
     # Add session configuration
-    SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24))
     SESSION_TYPE = 'filesystem'
     PERMANENT_SESSION_LIFETIME = 1800  # 30 minutes
 
@@ -27,7 +26,5 @@ class TestingConfig(Config):
 
 config = {
     'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'testing': TestingConfig,
     'default': DevelopmentConfig
 } 
