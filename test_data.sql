@@ -1,83 +1,51 @@
--- Insert sample students
-INSERT INTO Student (student_id, first_name, last_name, email, date_of_birth, major, enrollment_date, status) VALUES
-                                                                                                                  ('S001', 'John', 'Doe', 'john.doe@university.edu', '2000-01-15', 'Computer Science', '2023-09-01', 'active'),
-                                                                                                                  ('S002', 'Jane', 'Smith', 'jane.smith@university.edu', '2000-03-22', 'Computer Science', '2023-09-01', 'active'),
-                                                                                                                  ('S003', 'Michael', 'Johnson', 'michael.j@university.edu', '1999-07-10', 'Mathematics', '2023-09-01', 'active'),
-                                                                                                                  ('S004', 'Sarah', 'Williams', 'sarah.w@university.edu', '2000-11-05', 'Physics', '2023-09-01', 'active'),
-                                                                                                                  ('S005', 'David', 'Brown', 'david.b@university.edu', '2001-02-28', 'Computer Science', '2023-09-01', 'active'),
-                                                                                                                  ('S006', 'Emily', 'Davis', 'emily.d@university.edu', '2000-09-12', 'Mathematics', '2023-09-01', 'active'),
-                                                                                                                  ('S007', 'Robert', 'Wilson', 'robert.w@university.edu', '1999-12-25', 'Physics', '2023-09-01', 'active'),
-                                                                                                                  ('S008', 'Lisa', 'Anderson', 'lisa.a@university.edu', '2000-04-18', 'Computer Science', '2023-09-01', 'active'),
-                                                                                                                  ('S009', 'James', 'Taylor', 'james.t@university.edu', '2001-06-30', 'Mathematics', '2023-09-01', 'active'),
-                                                                                                                  ('S010', 'Jennifer', 'Martinez', 'jennifer.m@university.edu', '2000-08-14', 'Physics', '2023-09-01', 'active');
+-- Test data for Student table
+INSERT INTO Student (student_id, first_name, last_name, date_of_birth, major, status, enrollment_date, email) VALUES
+(1, 'John', 'Smith', '2000-05-15', 'Computer Science', 'active', '2020-09-01', 'john.smith@university.edu'),
+(2, 'Emma', 'Johnson', '2001-03-22', 'Mathematics', 'active', '2021-01-15', 'emma.j@university.edu'),
+(3, 'Michael', 'Brown', '1999-11-30', 'Physics', 'active', '2019-09-01', 'michael.b@university.edu'),
+(4, 'Sarah', 'Davis', '2000-07-18', 'Chemistry', 'graduated', '2019-09-01', 'sarah.d@university.edu'),
+(5, 'David', 'Wilson', '2001-09-25', 'Computer Science', 'active', '2021-09-01', 'david.w@university.edu');
 
--- Insert sample professors
-INSERT INTO Professor (professor_id, first_name, last_name, email, department, hire_date, status) VALUES
-                                                                                                      ('P001', 'Alice', 'Johnson', 'alice.j@university.edu', 'Computer Science', '2020-01-15', 'active'),
-                                                                                                      ('P002', 'Robert', 'Smith', 'robert.s@university.edu', 'Mathematics', '2019-06-20', 'active'),
-                                                                                                      ('P003', 'Mary', 'Williams', 'mary.w@university.edu', 'Physics', '2018-08-30', 'active'),
-                                                                                                      ('P004', 'David', 'Brown', 'david.brown@university.edu', 'Computer Science', '2017-09-01', 'active'),
-                                                                                                      ('P005', 'Sarah', 'Davis', 'sarah.d@university.edu', 'Mathematics', '2021-01-10', 'active'),
-                                                                                                      ('P006', 'Michael', 'Wilson', 'michael.w@university.edu', 'Physics', '2019-12-15', 'active'),
-                                                                                                      ('P007', 'Emma', 'Anderson', 'emma.a@university.edu', 'Computer Science', '2020-07-01', 'active'),
-                                                                                                      ('P008', 'James', 'Taylor', 'james.taylor@university.edu', 'Mathematics', '2018-03-20', 'active'),
-                                                                                                      ('P009', 'Sophia', 'Martinez', 'sophia.m@university.edu', 'Physics', '2022-01-05', 'active'),
-                                                                                                      ('P010', 'William', 'Lee', 'william.l@university.edu', 'Computer Science', '2021-08-15', 'active');
+-- Test data for Professor table
+INSERT INTO Professor (professor_id, first_name, last_name, department, hire_date, email) VALUES
+(1, 'Robert', 'Anderson', 'Computer Science', '2015-08-15', 'r.anderson@university.edu'),
+(2, 'Jennifer', 'Martinez', 'Mathematics', '2012-01-10', 'j.martinez@university.edu'),
+(3, 'William', 'Taylor', 'Physics', '2010-09-01', 'w.taylor@university.edu'),
+(4, 'Elizabeth', 'Thomas', 'Chemistry', '2018-06-20', 'e.thomas@university.edu');
 
--- Insert sample courses
-INSERT INTO Course (course_id, course_code, course_name, description, credits, department, level) VALUES
-                                                                                                      ('CSE102', 'CSE102', 'Data Structures', 'Fundamental data structures and algorithms', 3, 'Computer Science', 'undergraduate'),
-                                                                                                      ('CSE201', 'CSE201', 'Database Systems', 'Design and implementation of database systems', 3, 'Computer Science', 'undergraduate'),
-                                                                                                      ('CSE202', 'CSE202', 'Web Development', 'Modern web development technologies and frameworks', 3, 'Computer Science', 'undergraduate'),
-                                                                                                      ('MTH101', 'MTH101', 'Calculus I', 'Introduction to differential and integral calculus', 4, 'Mathematics', 'undergraduate'),
-                                                                                                      ('MTH102', 'MTH102', 'Linear Algebra', 'Study of linear equations and vector spaces', 3, 'Mathematics', 'undergraduate'),
-                                                                                                      ('PHY101', 'PHY101', 'Classical Mechanics', 'Basic principles of classical mechanics', 4, 'Physics', 'undergraduate'),
-                                                                                                      ('PHY102', 'PHY102', 'Electromagnetism', 'Study of electric and magnetic fields', 4, 'Physics', 'undergraduate'),
-                                                                                                      ('CSE301', 'CSE301', 'Software Engineering', 'Software development methodologies and practices', 3, 'Computer Science', 'undergraduate'),
-                                                                                                      ('CSE302', 'CSE302', 'Computer Networks', 'Network protocols and architecture', 3, 'Computer Science', 'undergraduate');
+-- Test data for Courses table
+INSERT INTO Courses (course_id, course_code, course_name, description, credits, department) VALUES
+(1, 'CS101', 'Introduction to Programming', 'Basic concepts of programming using Python', 3, 'Computer Science'),
+(2, 'CS201', 'Data Structures', 'Advanced programming concepts and data structures', 4, 'Computer Science'),
+(3, 'MATH201', 'Calculus I', 'Limits, derivatives, and basic integration', 4, 'Mathematics'),
+(4, 'PHYS101', 'General Physics', 'Introduction to mechanics and thermodynamics', 4, 'Physics'),
+(5, 'CHEM101', 'General Chemistry', 'Basic principles of chemistry', 4, 'Chemistry');
 
--- Insert course prerequisites
-INSERT INTO Prerequisites (course_id, prerequisite_id) VALUES
-                                                           ('CSE102', 'CSE101'),
-                                                           ('CSE201', 'CSE102'),
-                                                           ('CSE202', 'CSE101'),
-                                                           ('MTH102', 'MTH101'),
-                                                           ('PHY102', 'PHY101'),
-                                                           ('CSE301', 'CSE201'),
-                                                           ('CSE302', 'CSE201');
+-- Test data for Prerequisite table
+INSERT INTO Prerequisite (prerequisite_id, course_id, prerequisite_course_id) VALUES
+(1, 2, 1), -- CS201 requires CS101
+(2, 4, 3); -- PHYS101 requires MATH201
 
--- Insert sample schedules
-INSERT INTO Schedule (schedule_id, course_id, semester, academic_year, meeting_days, start_time, end_time, room_number, building) VALUES
-                                                                                                                                      ('SCH001', 'CSE101', 'Fall', 2024, 'MWF', '09:00:00', '10:30:00', '101', 'Computer Science Building'),
-                                                                                                                                      ('SCH002', 'CSE232', 'Fall', 2024, 'TR', '14:00:00', '15:30:00', '102', 'Computer Science Building'),
-                                                                                                                                      ('SCH003', 'CSE331', 'Fall', 2024, 'MWF', '11:00:00', '12:30:00', '201', 'Computer Science Building'),
-                                                                                                                                      ('SCH004', 'CSE435', 'Fall', 2024, 'TR', '09:00:00', '10:30:00', '301', 'Computer Science Building'),
-                                                                                                                                      ('SCH005', 'CSE480', 'Fall', 2024, 'MWF', '14:00:00', '15:30:00', '401', 'Computer Science Building');
+-- Test data for Schedule table
+INSERT INTO Schedule (schedule_id, course_id, semester, start_time, end_time, meeting_days, room_num) VALUES
+(1, 1, 'Fall 2023', '09:00:00', '10:15:00', 'MWF', 'CS-101'),
+(2, 2, 'Fall 2023', '11:00:00', '12:15:00', 'TR', 'CS-102'),
+(3, 3, 'Fall 2023', '13:00:00', '14:15:00', 'MWF', 'MA-201'),
+(4, 4, 'Fall 2023', '14:30:00', '15:45:00', 'TR', 'PH-101'),
+(5, 5, 'Fall 2023', '10:30:00', '11:45:00', 'MWF', 'CH-101');
 
--- Insert teaching assignments
+-- Test data for Enrolled table
+INSERT INTO Enrolled (enrollment_id, student_id, schedule_id, grade) VALUES
+(1, 1, 1, 'A'),   -- John Smith in CS101
+(2, 1, 2, 'B+'),  -- John Smith in CS201
+(3, 2, 3, 'A-'),  -- Emma Johnson in MATH201
+(4, 3, 4, 'B'),   -- Michael Brown in PHYS101
+(5, 5, 1, NULL);  -- David Wilson in CS101 (grade not yet assigned)
+
+-- Test data for Teaching table
 INSERT INTO Teaching (teaching_id, professor_id, schedule_id) VALUES
-                                                                  ('T001', 'P001', 'SCH001'),
-                                                                  ('T002', 'P004', 'SCH002'),
-                                                                  ('T003', 'P007', 'SCH003'),
-                                                                  ('T004', 'P010', 'SCH004'),
-                                                                  ('T005', 'P001', 'SCH005');
-
--- Insert prerequisites
-INSERT INTO Prerequisites (course_id, prerequisite_id) VALUES
-                                                           ('CSE232', 'CSE101'),
-                                                           ('CSE331', 'CSE232'),
-                                                           ('CSE435', 'CSE331'),
-                                                           ('CSE480', 'CSE331');
-
--- Insert sample enrollments
-INSERT INTO Enrollment (enrollment_id, student_id, schedule_id, enrollment_date, status) VALUES
-                                                                                             ('E001', 'S001', 'SCH001', '2024-08-15', 'enrolled'),
-                                                                                             ('E002', 'S002', 'SCH001', '2024-08-15', 'enrolled'),
-                                                                                             ('E003', 'S003', 'SCH002', '2024-08-15', 'enrolled'),
-                                                                                             ('E004', 'S004', 'SCH002', '2024-08-15', 'enrolled'),
-                                                                                             ('E005', 'S005', 'SCH003', '2024-08-15', 'enrolled'),
-                                                                                             ('E006', 'S006', 'SCH003', '2024-08-15', 'enrolled'),
-                                                                                             ('E007', 'S007', 'SCH004', '2024-08-15', 'enrolled'),
-                                                                                             ('E008', 'S008', 'SCH004', '2024-08-15', 'enrolled'),
-                                                                                             ('E009', 'S009', 'SCH005', '2024-08-15', 'enrolled'),
-                                                                                             ('E010', 'S010', 'SCH005', '2024-08-15', 'enrolled');
+(1, 1, 1), -- Prof. Anderson teaches CS101
+(2, 1, 2), -- Prof. Anderson teaches CS201
+(3, 2, 3), -- Prof. Martinez teaches MATH201
+(4, 3, 4), -- Prof. Taylor teaches PHYS101
+(5, 4, 5); -- Prof. Thomas teaches CHEM101
