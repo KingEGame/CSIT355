@@ -37,7 +37,7 @@
                             data-course-name="{{ course[1] }}">
                         Enroll
                     </button>
-                    <a href="{{ url_for('prerequisites', course_id=course[0]) }}" 
+                    <a href="{{ url_for('courses.prerequisites', course_id=course[0]) }}" 
                        class="btn btn-sm btn-info">
                         Prerequisites
                     </a>
@@ -82,7 +82,7 @@ $(document).ready(function() {
 
     $('#confirmEnroll').click(function() {
         if (currentScheduleId) {
-            $.post('{{ url_for("enroll") }}', {
+            $.post('{{ url_for("courses.enroll") }}', {
                 schedule_id: currentScheduleId
             })
             .done(function(response) {

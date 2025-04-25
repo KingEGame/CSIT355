@@ -1,11 +1,30 @@
 /* General Styles */
 body {
     background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+.jumbotron {
+    padding: 2rem;
+    background-color: #e9ecef;
+    border-radius: .3rem;
 }
 
 /* Navbar Styles */
 .navbar {
     box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    margin-bottom: 2rem;
 }
 
 .navbar-brand {
@@ -19,7 +38,8 @@ body {
 }
 
 .card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 /* Table Styles */
@@ -86,6 +106,7 @@ body {
 .alert {
     border-radius: 4px;
     margin-bottom: 1rem;
+    margin: 1rem 2rem;
 }
 
 /* Responsive Adjustments */

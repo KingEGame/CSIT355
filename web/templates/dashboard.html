@@ -1,58 +1,43 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h1 class="mb-4">Welcome to MSU Course Management System</h1>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Welcome, {{ student_name }}</h2>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Course Registration</h5>
-                <p class="card-text">Browse available courses and enroll in classes for the upcoming semester.</p>
-                <a href="{{ url_for('courses') }}" class="btn btn-primary">View Courses</a>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">My Courses</h5>
+                    <p class="card-text">View and manage your current course enrollments.</p>
+                    <a href="{{ url_for('courses_bp.my_courses') }}" class="btn btn-primary">Go to My Courses</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">My Classes</h5>
-                <p class="card-text">View your current course schedule and manage your enrollments.</p>
-                <a href="{{ url_for('my_courses') }}" class="btn btn-primary">View My Classes</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Course Search</h5>
-                <p class="card-text">Search for specific courses by name or course code.</p>
-                <a href="{{ url_for('search') }}" class="btn btn-primary">Search Courses</a>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Prerequisites</h5>
-                <p class="card-text">Check course prerequisites and plan your academic path.</p>
-                <a href="{{ url_for('search') }}" class="btn btn-primary">View Prerequisites</a>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Course Catalog</h5>
+                    <p class="card-text">Browse and enroll in available courses.</p>
+                    <a href="{{ url_for('courses_bp.list_courses') }}" class="btn btn-primary">View Courses</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Professor Information</h5>
-                <p class="card-text">View professor details and their course offerings.</p>
-                <a href="{{ url_for('professors') }}" class="btn btn-primary">View Professors</a>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Search Courses</h5>
+                    <p class="card-text">Search for specific courses by name or ID.</p>
+                    <a href="{{ url_for('courses_bp.search') }}" class="btn btn-primary">Search</a>
+                </div>
             </div>
         </div>
     </div>

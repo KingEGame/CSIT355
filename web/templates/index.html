@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Student Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to Student Management System</h1>
+        <p class="lead">Manage courses, students, and professors efficiently.</p>
+        <hr class="my-4">
+        <p>Please use the navigation menu above to access different sections of the system.</p>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Courses</h5>
+                    <p class="card-text">View and manage course offerings.</p>
+                    <a href="{{ url_for('courses_bp.list_courses') }}" class="btn btn-primary">Go to Courses</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <p class="card-text">Manage student information and enrollments.</p>
+                    <a href="{{ url_for('auth_bp.student_login') }}" class="btn btn-primary">Student Portal</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Professors</h5>
+                    <p class="card-text">Access professor portal and course assignments.</p>
+                    <a href="{{ url_for('professors_bp.professor_login') }}" class="btn btn-primary">Professor Portal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Class Schedule{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Class Schedule</h1>
+            <p class="mt-2 text-gray-600">Your weekly class schedule for the current semester.</p>
+        </div>
+
+        <!-- Schedule Grid -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+                <h3 class="text-lg font-medium text-gray-900">Weekly Schedule</h3>
+            </div>
+
+            {% if any(schedule.values()) %}
+            <div class="overflow-x-auto">
+                <div class="min-w-full">
+                    <!-- Time slots (8 AM to 8 PM) -->
+                    {% set time_slots = [
+                        '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
+                        '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM',
+                        '6:00 PM', '7:00 PM', '8:00 PM'
+                    ] %}
+
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="w-20 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Time
+                                </th>
+                                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {{ day }}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for time in time_slots %}
+                            <tr class="divide-x divide-gray-200">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 bg-gray-50">
+                                    {{ time }}
+                                </td>
+                                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                                <td class="px-6 py-4">
+                                    {% for enrollment in schedule[day] %}
+                                        {% set start_time = enrollment.schedule.schedule_time.split(' - ')[0].split(' ', 1)[1] %}
+                                        {% if start_time == time %}
+                                        <div class="rounded-lg bg-indigo-50 p-3 shadow-sm border border-indigo-100">
+                                            <div class="font-medium text-indigo-700">
+                                                {{ enrollment.schedule.course.course_code }}
+                                            </div>
+                                            <div class="text-sm text-indigo-500">
+                                                {{ enrollment.schedule.course.course_name }}
+                                            </div>
+                                            <div class="mt-1 text-xs text-indigo-400">
+                                                Room {{ enrollment.schedule.room }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No classes scheduled</h3>
+                <p class="mt-1 text-sm text-gray-500">Register for courses to see your schedule here.</p>
+                <div class="mt-6">
+                    <a href="{{ url_for('students.available_courses') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        Browse Courses
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Schedule Information</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-indigo-50 border border-indigo-100 rounded"></div>
+                        <span class="text-sm text-gray-600">Class Session</span>
+                    </div>
+                    <p class="text-sm text-gray-500">
+                        * Schedule shows regular class meetings. Check course syllabus for additional sessions or changes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

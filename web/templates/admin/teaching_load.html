@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Teaching Load Overview - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8 px-4 md:px-8">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed bottom-4 right-4 z-50">
+                {% for category, message in messages %}
+                    <div class="flex items-center p-4 mb-4 rounded-lg {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}">
+                        <span class="mr-2">
+                            {% if category == 'success' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            {% else %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            {% endif %}
+                        </span>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Teaching Load Overview</h1>
+                <p class="mt-2 text-gray-600">Current teaching assignments and workload distribution</p>
+            </div>
+            <a href="{{ url_for('admin.professor_list') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Professor List
+            </a>
+        </div>
+    </div>
+
+    <!-- Department Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {% set department_stats = {} %}
+        {% for data in teaching_data.values() %}
+            {% if data.department not in department_stats %}
+                {% set _ = department_stats.update({data.department: {'count': 0, 'courses': 0}}) %}
+            {% endif %}
+            {% set _ = department_stats[data.department].update({
+                'count': department_stats[data.department]['count'] + 1,
+                'courses': department_stats[data.department]['courses'] + data.current_courses
+            }) %}
+        {% endfor %}
+
+        {% for department, stats in department_stats.items() %}
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-900">{{ department }}</h3>
+                <dl class="mt-4 grid grid-cols-2 gap-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Professors</dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">{{ stats.count }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Total Courses</dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">{{ stats.courses }}</dd>
+                    </div>
+                </dl>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Teaching Load Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Professor
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Department
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Current Courses
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Load
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for professor_id, data in teaching_data.items() %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ data.name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ data.department }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ data.current_courses }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if data.status == 'active' %}
+                                        bg-green-100 text-green-800
+                                    {% elif data.status == 'inactive' %}
+                                        bg-red-100 text-red-800
+                                    {% else %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% endif %}">
+                                    {{ data.status|title }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        {% set load_percentage = (data.current_courses / 4 * 100)|round %}
+                                        <div class="h-2 rounded-full 
+                                            {% if load_percentage >= 100 %}
+                                                bg-red-500
+                                            {% elif load_percentage >= 75 %}
+                                                bg-yellow-500
+                                            {% else %}
+                                                bg-green-500
+                                            {% endif %}"
+                                            style="width: {{ load_percentage }}%">
+                                        </div>
+                                    </div>
+                                    <span class="ml-2 text-sm text-gray-600">{{ load_percentage }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Load Distribution Chart -->
+    <div class="mt-8 bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Teaching Load Distribution</h3>
+        <div class="relative">
+            {% set load_ranges = {
+                'Underloaded (0-2 courses)': {'count': 0, 'color': 'green'},
+                'Optimal (3-4 courses)': {'count': 0, 'color': 'blue'},
+                'High (5+ courses)': {'count': 0, 'color': 'red'}
+            } %}
+
+            {% for data in teaching_data.values() %}
+                {% if data.current_courses < 3 %}
+                    {% set _ = load_ranges['Underloaded (0-2 courses)'].update({'count': load_ranges['Underloaded (0-2 courses)']['count'] + 1}) %}
+                {% elif data.current_courses <= 4 %}
+                    {% set _ = load_ranges['Optimal (3-4 courses)'].update({'count': load_ranges['Optimal (3-4 courses)']['count'] + 1}) %}
+                {% else %}
+                    {% set _ = load_ranges['High (5+ courses)'].update({'count': load_ranges['High (5+ courses)']['count'] + 1}) %}
+                {% endif %}
+            {% endfor %}
+
+            {% set total = teaching_data|length %}
+            
+            <div class="flex h-4 mb-4">
+                {% for range, data in load_ranges.items() %}
+                    {% if data.count > 0 %}
+                        <div class="bg-{{ data.color }}-500" style="width: {{ (data.count / total * 100)|round }}%"
+                             title="{{ range }}: {{ data.count }} professors ({{ (data.count / total * 100)|round }}%)">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="flex flex-wrap gap-4">
+                {% for range, data in load_ranges.items() %}
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-{{ data.color }}-500 mr-2"></div>
+                        <span class="text-sm text-gray-600">{{ range }}: {{ data.count }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

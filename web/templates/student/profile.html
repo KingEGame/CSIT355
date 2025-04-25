@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Profile Settings</h1>
+            <p class="mt-2 text-gray-600">Manage your personal information and preferences.</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="mb-4 rounded-md p-4 {% if category == 'success' %}bg-green-50{% else %}bg-red-50{% endif %}"
+                     role="alert">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {% if category == 'success' %}
+                            <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            {% else %}
+                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium {% if category == 'success' %}text-green-800{% else %}text-red-800{% endif %}">
+                                {{ message }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Profile Form -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <form method="POST" class="divide-y divide-gray-200">
+                {{ form.csrf_token }}
+                
+                <!-- Personal Information -->
+                <div class="px-4 py-5 space-y-6 sm:p-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Personal Information</h3>
+                        <p class="mt-1 text-sm text-gray-500">Update your basic profile information.</p>
+                    </div>
+
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-3">
+                            {{ form.first_name.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.first_name(class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                            {% if form.first_name.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.first_name.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            {{ form.last_name.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.last_name(class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                            {% if form.last_name.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.last_name.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-span-6">
+                            {{ form.email.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.email(class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                            {% if form.email.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.email.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Change -->
+                <div class="px-4 py-5 space-y-6 sm:p-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Change Password</h3>
+                        <p class="mt-1 text-sm text-gray-500">Ensure your account is secure by using a strong password.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            {{ form.current_password.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.current_password(class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                            {% if form.current_password.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.current_password.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            {{ form.new_password.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.new_password(class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                            {% if form.new_password.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.new_password.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.confirm_password(class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                            {% if form.confirm_password.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.confirm_password.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Account Management -->
+        <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Account Management</h3>
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-500">
+                        Need help with your account? Contact support at:
+                        <a href="mailto:support@university.edu" class="text-indigo-600 hover:text-indigo-500">
+                            support@university.edu
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Student Status Overview - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8 px-4 md:px-8">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed bottom-4 right-4 z-50">
+                {% for category, message in messages %}
+                    <div class="flex items-center p-4 mb-4 rounded-lg {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}">
+                        <span class="mr-2">
+                            {% if category == 'success' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            {% else %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            {% endif %}
+                        </span>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Student Status Overview</h1>
+                <p class="mt-2 text-gray-600">View and analyze student status distribution</p>
+            </div>
+            <a href="{{ url_for('admin.student_list') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for status, data in status_data.items() %}
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-{{ data.color }}-100">
+                            <svg class="w-6 h-6 text-{{ data.color }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {% if status == 'active' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                {% elif status == 'inactive' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                {% elif status == 'graduated' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                {% else %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                {% endif %}
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-lg font-semibold text-gray-900">{{ status|title }}</h2>
+                            <div class="mt-1">
+                                <p class="text-3xl font-bold text-{{ data.color }}-600">{{ data.count }}</p>
+                                <p class="text-sm text-gray-500">students</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ url_for('admin.student_list', status=status) }}" class="inline-flex items-center text-sm font-medium text-{{ data.color }}-600 hover:text-{{ data.color }}-700">
+                            View Students
+                            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Status Chart -->
+    <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Distribution</h3>
+            <div class="relative">
+                <div class="flex h-4 mb-4">
+                    {% set total = status_data.values()|map(attribute='count')|sum %}
+                    {% for status, data in status_data.items() %}
+                        {% if data.count > 0 %}
+                            <div class="bg-{{ data.color }}-500" style="width: '{{ (data.count / total * 100)|round }}%'"
+                                 title="{{ status|title }}: {{ data.count }} students ({{ (data.count / total * 100)|round }}%)">
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="flex flex-wrap gap-4">
+                    {% for status, data in status_data.items() %}
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-{{ data.color }}-500 mr-2"></div>
+                            <span class="text-sm text-gray-600">{{ status|title }}: {{ data.count }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

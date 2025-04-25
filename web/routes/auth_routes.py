@@ -1,56 +1,95 @@
-from flask import render_template, request, redirect, url_for, flash, session
-from ..models import db, Student
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
-from . import auth
 
-@auth.route('/')
+auth_bp = Blueprint('auth', __name__)
+
+@auth_bp.route('/')
 def index():
-    if 'student_id' not in session:
-        return render_template('login.html')
-    return redirect(url_for('courses.index'))
+    if 'student_id' in session:
+        return redirect(url_for('students.dashboard'))
+    elif 'professor_id' in session:
+        return redirect(url_for('professors.dashboard'))
+    return render_template('auth/login.html')
 
-@auth.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    student_id = request.form.get('student_id')
-    student = Student.query.get(student_id)
-    if student:
-        session['student_id'] = student_id
-        session['student_name'] = f"{student.first_name} {student.last_name}"
-        return redirect(url_for('courses.index'))
-    flash('Invalid student ID', 'error')
-    return redirect(url_for('auth.index'))
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        user_type = request.form.get('user_type')
+        
+        if user_type == 'student':
+            student = Student.query.get(user_id)
+            if student and student.status == StudentStatus.active:
+                session['student_id'] = student.student_id
+                session['student_name'] = f"{student.first_name} {student.last_name}"
+                session['user_type'] = 'student'
+                return redirect(url_for('students.dashboard'))
+            flash('Invalid student ID or inactive account', 'error')
+        
+        elif user_type == 'professor':
+            professor = Professor.query.get(user_id)
+            if professor and professor.status == ProfessorStatus.active:
+                session['professor_id'] = professor.professor_id
+                session['professor_name'] = f"{professor.first_name} {professor.last_name}"
+                session['user_type'] = 'professor'
+                return redirect(url_for('professors.dashboard'))
+            flash('Invalid professor ID or inactive account', 'error')
+        
+        else:
+            flash('Invalid user type', 'error')
+    
+    return render_template('auth/login.html')
 
-@auth.route('/register', methods=['POST'])
-def register():
-    student_id = request.form.get('student_id')
-    first_name = request.form.get('first_name')
-    last_name = request.form.get('last_name')
-    email = request.form.get('email')
-    date_of_birth = datetime.strptime(request.form.get('date_of_birth'), '%Y-%m-%d').date()
-    major = request.form.get('major')
-
-    student = Student(
-        student_id=student_id,
-        first_name=first_name,
-        last_name=last_name,
-        email=email,
-        date_of_birth=date_of_birth,
-        major=major
-    )
-
-    try:
-        db.session.add(student)
-        db.session.commit()
-        session['student_id'] = student_id
-        session['student_name'] = f"{first_name} {last_name}"
-        flash('Registration successful!', 'success')
-        return redirect(url_for('courses.index'))
-    except Exception as e:
-        db.session.rollback()
-        flash('Registration failed. Please try again.', 'error')
-        return redirect(url_for('auth.index'))
-
-@auth.route('/logout')
+@auth_bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('auth.index')) 
+    return redirect(url_for('auth.index'))
+
+# Registration routes can be added here if needed
+@auth_bp.route('/register/student', methods=['GET', 'POST'])
+def register_student():
+    if request.method == 'POST':
+        try:
+            student = Student(
+                student_id=request.form['student_id'],
+                first_name=request.form['first_name'],
+                last_name=request.form['last_name'],
+                date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
+                major=request.form['major'],
+                email=request.form['email'],
+                enrollment_date=datetime.utcnow()
+            )
+            db.session.add(student)
+            db.session.commit()
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('auth.login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Registration failed: {str(e)}', 'error')
+    
+    return render_template('auth/register_student.html')
+
+@auth_bp.route('/register/professor', methods=['GET', 'POST'])
+def register_professor():
+    if request.method == 'POST':
+        try:
+            professor = Professor(
+                professor_id=request.form['professor_id'],
+                first_name=request.form['first_name'],
+                last_name=request.form['last_name'],
+                department=request.form['department'],
+                email=request.form['email'],
+                office_number=request.form['office_number'],
+                phone=request.form['phone'],
+                hire_date=datetime.utcnow()
+            )
+            db.session.add(professor)
+            db.session.commit()
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('auth.login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Registration failed: {str(e)}', 'error')
+    
+    return render_template('auth/register_professor.html') 

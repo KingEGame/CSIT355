@@ -1,36 +1,37 @@
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
-from ..models import db, Course, Schedule, Enrollment, Prerequisites
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from ..models import db, Course, Schedule, Enrolled, Prerequisite
 from datetime import datetime
-from . import courses  # Ensure this line is present to import the courses blueprint
 
-@courses.route('/dashboard')
+courses_bp = Blueprint('courses', __name__)
+
+@courses_bp.route('/dashboard')
 def index():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
     return render_template('dashboard.html', student_name=session['student_name'])
 
-@courses.route('/courses')
+@courses_bp.route('/courses')
 def list_courses():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
     schedules = Schedule.query.all()
     return render_template('courses.html', courses=schedules)
 
-@courses.route('/my-courses')
+@courses_bp.route('/my-courses')
 def my_courses():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
-    enrollments = Enrollment.query.filter_by(student_id=session['student_id']).all()
+    enrollments = Enrolled.query.filter_by(student_id=session['student_id']).all()
     return render_template('my_courses.html', courses=enrollments)
 
-@courses.route('/enroll', methods=['POST'])
+@courses_bp.route('/enroll', methods=['POST'])
 def enroll():
     if 'student_id' not in session:
         return jsonify({'success': False, 'message': 'Not logged in'})
     
     schedule_id = request.form.get('schedule_id')
     try:
-        enrollment = Enrollment(
+        enrollment = Enrolled(
             student_id=session['student_id'],
             schedule_id=schedule_id
         )
@@ -41,14 +42,14 @@ def enroll():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
-@courses.route('/withdraw', methods=['POST'])
+@courses_bp.route('/withdraw', methods=['POST'])
 def withdraw():
     if 'student_id' not in session:
         return jsonify({'success': False, 'message': 'Not logged in'})
     
     schedule_id = request.form.get('schedule_id')
     try:
-        enrollment = Enrollment.query.filter_by(
+        enrollment = Enrolled.query.filter_by(
             student_id=session['student_id'],
             schedule_id=schedule_id
         ).first()
@@ -61,7 +62,7 @@ def withdraw():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
-@courses.route('/search')
+@courses_bp.route('/search')
 def search():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
@@ -72,9 +73,13 @@ def search():
     ).all()
     return render_template('search.html', courses=schedules, search_term=search_term)
 
-@courses.route('/prerequisites/<course_id>')
+@courses_bp.route('/prerequisites/<course_id>')
 def prerequisites(course_id):
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
-    prerequisites = Prerequisites.query.filter_by(course_id=course_id).all()
-    return render_template('prerequisites.html', prerequisites=prerequisites, course_id=course_id) 
+    
+    course = Course.query.get_or_404(course_id)
+    prerequisites = course.prerequisites.all()
+    return render_template('prerequisites.html', 
+                         prerequisites=prerequisites, 
+                         course=course) 
