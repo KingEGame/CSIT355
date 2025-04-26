@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, EmailField, TextAreaField, IntegerField, BooleanField
 from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError, EqualTo, Regexp, NumberRange
-from web.models import Student, StudentStatus, CourseLevel, Major, Professor, Department, Course
+from web.models import Student, StudentStatus, Course, Professor, CourseLevel
 import re
 
 class ProfileForm(FlaskForm):
@@ -50,14 +50,11 @@ class StudentForm(FlaskForm):
         Optional(),
         Length(min=6, message='Password must be at least 6 characters long')
     ])
-    major = SelectField('Major', validators=[DataRequired()])
-    level = SelectField('Level', validators=[DataRequired()])
+    major = StringField('Major', validators=[DataRequired(), Length(max=50)])
     status = SelectField('Status', validators=[DataRequired()])
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-        self.major.choices = [(m.name, m.value) for m in Major]
-        self.level.choices = [(l.name, l.value) for l in CourseLevel]
         self.status.choices = [(s.name, s.value) for s in StudentStatus]
 
     def validate_email(self, field):
@@ -84,10 +81,14 @@ class ProfessorForm(FlaskForm):
         Optional(),
         Length(min=6, message='Password must be at least 6 characters long')
     ])
-    department = SelectField('Department', validators=[DataRequired()])
+    department = StringField('Department', validators=[DataRequired(), Length(max=50)])
     office_location = StringField('Office Location', validators=[
         DataRequired(),
         Length(max=50, message='Office location must be less than 50 characters')
+    ])
+    office_number = StringField('Office Number', validators=[
+        Optional(),
+        Length(max=20, message='Office number must be less than 20 characters')
     ])
     office_hours = TextAreaField('Office Hours', validators=[
         DataRequired(),
@@ -102,10 +103,16 @@ class ProfessorForm(FlaskForm):
         ('inactive', 'Inactive'),
         ('on_leave', 'On Leave')
     ], validators=[DataRequired()])
+    current_password = PasswordField('Current Password')
+    new_password = PasswordField('New Password', validators=[
+        Length(min=8, message="Password must be at least 8 characters long")
+    ])
+    confirm_password = PasswordField('Confirm New Password', validators=[
+        EqualTo('new_password', message='Passwords must match')
+    ])
 
     def __init__(self, *args, **kwargs):
         super(ProfessorForm, self).__init__(*args, **kwargs)
-        self.department.choices = [(d.name, d.value) for d in Department]
 
     def validate_email(self, field):
         professor = Professor.query.filter_by(email=field.data).first()
@@ -127,7 +134,7 @@ class CourseForm(FlaskForm):
         DataRequired(),
         Length(min=10, max=500)
     ])
-    department = SelectField('Department', validators=[DataRequired()], coerce=str)
+    department = StringField('Department', validators=[DataRequired(), Length(max=50)])
     level = SelectField('Level', validators=[DataRequired()], coerce=str)
     credits = IntegerField('Credits', validators=[
         DataRequired(),
@@ -138,7 +145,6 @@ class CourseForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
-        self.department.choices = [(dept.name, dept.value) for dept in Department]
         self.level.choices = [(level.name, level.value) for level in CourseLevel]
 
     def validate_prerequisites(self, field):

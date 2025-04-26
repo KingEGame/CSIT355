@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import or_
-from web.models import Course, Schedule, Professor, Student, Enrollment
+from web.models import Course, Schedule, Professor, Student, Enrolled, CourseLevel, Semester
 from web.extensions import db
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -13,7 +13,7 @@ students = Blueprint('students', __name__)
 @login_required
 def dashboard():
     # Get current enrollments for the student
-    current_enrollments = (Enrollment.query
+    current_enrollments = (Enrolled.query
         .filter_by(student_id=current_user.id)
         .join(Schedule)
         .join(Course)
@@ -39,7 +39,7 @@ def available_courses():
     query = (Schedule.query
         .join(Course)
         .join(Professor)
-        .filter(Schedule.year >= datetime.now().year))  # Only future or current year courses
+        .filter(Schedule.academic_year >= datetime.now().year))  # Only future or current year courses
     
     # Apply search filter
     if search:
@@ -53,14 +53,22 @@ def available_courses():
     
     # Apply semester filter
     if semester != 'all':
-        query = query.filter(Schedule.semester == semester.upper())
+        try:
+            sem_enum = Semester[semester]
+            query = query.filter(Schedule.semester == sem_enum)
+        except KeyError:
+            pass
     
     # Apply level filter
     if level != 'all':
-        query = query.filter(Course.level == level.upper())
+        try:
+            level_enum = CourseLevel[level]
+            query = query.filter(Course.level == level_enum)
+        except KeyError:
+            pass
     
     # Get student's current enrollments to exclude
-    enrolled_schedule_ids = db.session.query(Enrollment.schedule_id).filter_by(student_id=current_user.id)
+    enrolled_schedule_ids = db.session.query(Enrolled.schedule_id).filter_by(student_id=current_user.id)
     query = query.filter(~Schedule.schedule_id.in_(enrolled_schedule_ids))
     
     # Execute query with pagination
@@ -82,7 +90,7 @@ def register_course():
     schedule = Schedule.query.get_or_404(schedule_id)
     
     # Check if already enrolled
-    existing_enrollment = Enrollment.query.filter_by(
+    existing_enrollment = Enrolled.query.filter_by(
         student_id=current_user.id,
         schedule_id=schedule_id
     ).first()
@@ -92,12 +100,12 @@ def register_course():
         return redirect(url_for('students.available_courses'))
     
     # Check if course is full
-    if schedule.current_enrollment >= schedule.max_capacity:
+    if schedule.current_enrollment >= schedule.max_enrollment:
         flash('This course is full.', 'error')
         return redirect(url_for('students.available_courses'))
     
     # Create new enrollment
-    enrollment = Enrollment(
+    enrollment = Enrolled(
         student_id=current_user.id,
         schedule_id=schedule_id,
         enrollment_date=datetime.now()
@@ -125,7 +133,7 @@ def drop_course():
         flash('Invalid course selection.', 'error')
         return redirect(url_for('students.dashboard'))
     
-    enrollment = Enrollment.query.filter_by(
+    enrollment = Enrolled.query.filter_by(
         student_id=current_user.id,
         schedule_id=schedule_id
     ).first_or_404()
@@ -148,11 +156,11 @@ def drop_course():
 @login_required
 def academic_history():
     # Get all past enrollments with grades
-    past_enrollments = (Enrollment.query
+    past_enrollments = (Enrolled.query
         .filter_by(student_id=current_user.id)
         .join(Schedule)
         .join(Course)
-        .filter(Schedule.year < datetime.now().year)
+        .filter(Schedule.academic_year < datetime.now().year)
         .all())
     
     # Calculate GPA
@@ -180,10 +188,10 @@ def academic_history():
 def view_schedule():
     # Get current semester enrollments
     current_year = datetime.now().year
-    current_enrollments = (Enrollment.query
+    current_enrollments = (Enrolled.query
         .filter_by(student_id=current_user.id)
         .join(Schedule)
-        .filter(Schedule.year == current_year)
+        .filter(Schedule.academic_year == current_year)
         .all())
     
     # Organize schedule by days

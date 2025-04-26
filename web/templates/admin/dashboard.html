@@ -3,233 +3,109 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100">
+<div class="container py-4">
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="fixed bottom-4 right-4 z-50">
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
                 {% for category, message in messages %}
-                    <div class="flex items-center p-4 mb-4 rounded-lg {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}">
-                        <span class="mr-2">
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} d-flex align-items-center" role="alert">
+                        <div class="me-2">
                             {% if category == 'success' %}
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
+                            <svg width="20" height="20" fill="currentColor" class="bi bi-check-circle text-success" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.97 11.03a.75.75 0 0 0 1.07 0l3.992-3.992a.75.75 0 1 0-1.06-1.06L7.5 9.44 6.03 7.97a.75.75 0 1 0-1.06 1.06l1.5 1.5z"/>
+                            </svg>
                             {% else %}
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
+                            <svg width="20" height="20" fill="currentColor" class="bi bi-x-circle text-danger" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
                             {% endif %}
-                        </span>
-                        {{ message }}
+                        </div>
+                        <div>{{ message }}</div>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
     {% endwith %}
 
-    <div class="py-8 px-4 md:px-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p class="mt-2 text-gray-600">Manage your institution's academic system</p>
-        </div>
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">Admin Dashboard</h1>
+        <p class="lead text-muted">Manage your institution's academic system</p>
+    </div>
 
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width:56px; height:56px;">
+                        <svg width="32" height="32" fill="currentColor" class="bi bi-people text-primary" viewBox="0 0 16 16">
+                            <path d="M13 7a2 2 0 1 0-4 0 2 2 0 0 0 4 0zm-6 2a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6 1c-1.105 0-2 .672-2 1.5V13h4v-1.5c0-.828-.895-1.5-2-1.5zm-6 0c-1.105 0-2 .672-2 1.5V13h4v-1.5c0-.828-.895-1.5-2-1.5z"/>
                         </svg>
                     </div>
-                    <div class="ml-4">
-                        <h2 class="text-lg font-semibold text-gray-700">Total Students</h2>
-                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_students }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-green-100">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h2 class="text-lg font-semibold text-gray-700">Active Courses</h2>
-                        <p class="text-2xl font-bold text-gray-900">{{ stats.active_courses }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-purple-100">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h2 class="text-lg font-semibold text-gray-700">Total Professors</h2>
-                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_professors }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-yellow-100">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <h2 class="text-lg font-semibold text-gray-700">Active Enrollments</h2>
-                        <p class="text-2xl font-bold text-gray-900">{{ stats.active_enrollments }}</p>
-                    </div>
+                    <h5 class="card-title">Total Students</h5>
+                    <p class="fs-3 fw-bold mb-0">{{ stats.total_students }}</p>
                 </div>
             </div>
         </div>
-
-        <!-- Management Sections -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Student Management -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Student Management</h3>
-                    <div class="space-y-4">
-                        <a href="{{ url_for('admin.student_list') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                </svg>
-                                View All Students
-                            </div>
-                        </a>
-                        <a href="{{ url_for('admin.add_student') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                Add New Student
-                            </div>
-                        </a>
-                        <a href="{{ url_for('admin.student_status') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Manage Status
-                            </div>
-                        </a>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width:56px; height:56px;">
+                        <svg width="32" height="32" fill="currentColor" class="bi bi-person-badge text-info" viewBox="0 0 16 16">
+                            <path d="M6.5 2a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0zM2 13s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2zm7-6a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
+                        </svg>
                     </div>
-                </div>
-            </div>
-
-            <!-- Professor Management -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Professor Management</h3>
-                    <div class="space-y-4">
-                        <a href="{{ url_for('admin.professor_list') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2"/>
-                                </svg>
-                                View All Professors
-                            </div>
-                        </a>
-                        <a href="{{ url_for('admin.add_professor') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                Add New Professor
-                            </div>
-                        </a>
-                        <a href="{{ url_for('admin.teaching_assignments') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                Teaching Assignments
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Course Management -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Course Management</h3>
-                    <div class="space-y-4">
-                        <a href="{{ url_for('admin.course_list') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                </svg>
-                                View All Courses
-                            </div>
-                        </a>
-                        <a href="{{ url_for('admin.add_course') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                Add New Course
-                            </div>
-                        </a>
-                        <a href="{{ url_for('admin.course_schedules') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
-                            <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                Manage Schedules
-                            </div>
-                        </a>
-                    </div>
+                    <h5 class="card-title">Total Professors</h5>
+                    <p class="fs-3 fw-bold mb-0">{{ stats.total_professors }}</p>
                 </div>
             </div>
         </div>
-
-        <!-- System Settings -->
-        <div class="mt-8 bg-white rounded-lg shadow">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4">System Settings</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="{{ url_for('admin.academic_calendar') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width:56px; height:56px;">
+                        <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
+                            <path d="M6 8V1h1v6.117l.447-.276a.5.5 0 0 1 .553 0l.447.276V1h1v7l-1-.618-1 .618z"/>
+                            <path d="M2 2.5A1.5 1.5 0 0 1 3.5 1h7A1.5 1.5 0 0 1 12 2.5v11A1.5 1.5 0 0 1 10.5 15h-7A1.5 1.5 0 0 1 2 13.5v-11zm1.5-.5A.5.5 0 0 0 3 2.5v11a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5h-7z"/>
                         </svg>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Academic Calendar</h4>
-                            <p class="text-sm text-gray-600">Manage academic terms and important dates</p>
-                        </div>
-                    </a>
-                    <a href="{{ url_for('admin.departments') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">Departments</h4>
-                            <p class="text-sm text-gray-600">Manage academic departments</p>
-                        </div>
-                    </a>
-                    <a href="{{ url_for('admin.system_logs') }}" class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">System Logs</h4>
-                            <p class="text-sm text-gray-600">View system activity and audit logs</p>
-                        </div>
-                    </a>
+                    </div>
+                    <h5 class="card-title">Active Courses</h5>
+                    <p class="fs-3 fw-bold mb-0">{{ stats.active_courses }}</p>
                 </div>
             </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width:56px; height:56px;">
+                        <svg width="32" height="32" fill="currentColor" class="bi bi-clipboard-data text-warning" viewBox="0 0 16 16">
+                            <path d="M6.5 0a.5.5 0 0 1 .5.5V1h2v-.5a.5.5 0 0 1 1 0V1h.5A1.5 1.5 0 0 1 12 2.5V3h1.5A1.5 1.5 0 0 1 15 4.5v9A1.5 1.5 0 0 1 13.5 15h-11A1.5 1.5 0 0 1 1 13.5v-9A1.5 1.5 0 0 1 2.5 3H4v-.5A1.5 1.5 0 0 1 5.5 1H6V.5a.5.5 0 0 1 .5-.5zM2.5 4A.5.5 0 0 0 2 4.5v9a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-11z"/>
+                        </svg>
+                    </div>
+                    <h5 class="card-title">Active Enrollments</h5>
+                    <p class="fs-3 fw-bold mb-0">{{ stats.active_enrollments }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="row g-4">
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.student_list') }}" class="btn btn-outline-primary w-100 mb-2">Manage Students</a>
+            <a href="{{ url_for('admin.add_student') }}" class="btn btn-outline-success w-100 mb-2">Add Student</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.professor_list') }}" class="btn btn-outline-primary w-100 mb-2">Manage Professors</a>
+            <a href="{{ url_for('admin.add_professor') }}" class="btn btn-outline-success w-100 mb-2">Add Professor</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.course_list') }}" class="btn btn-outline-primary w-100 mb-2">Manage Courses</a>
+            <a href="{{ url_for('admin.add_course') }}" class="btn btn-outline-success w-100 mb-2">Add Course</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.teaching_assignments') }}" class="btn btn-outline-info w-100 mb-2">Teaching Assignments</a>
         </div>
     </div>
 </div>

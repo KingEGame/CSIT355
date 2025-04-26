@@ -1,51 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h2>Available Courses</h2>
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="mb-4 d-flex align-items-center justify-content-between">
+            <h1 class="h2 fw-bold text-dark mb-0">Courses</h1>
+            <a href="{{ url_for('admin.add_course') }}" class="btn btn-primary">Add Course</a>
+        </div>
+        <div class="bg-white shadow-sm rounded p-4">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr>
+                            <td class="fw-medium text-dark">{{ course.course_code }}</td>
+                            <td class="text-muted">{{ course.course_name }}</td>
+                            <td class="text-muted">{{ course.credits }}</td>
+                            <td class="text-muted">{{ course.department }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.edit_course', course_id=course.id) }}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Course ID</th>
-                <th>Course Name</th>
-                <th>Semester</th>
-                <th>Days</th>
-                <th>Time</th>
-                <th>Location</th>
-                <th>Professor</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for course in courses %}
-            <tr>
-                <td>{{ course[0] }}</td>
-                <td>{{ course[1] }}</td>
-                <td>{{ course[2] }}</td>
-                <td>{{ course[4] }}</td>
-                <td>{{ course[5].strftime('%H:%M') }}-{{ course[6].strftime('%H:%M') }}</td>
-                <td>{{ course[8] }} {{ course[7] }}</td>
-                <td>{{ course[9] }} {{ course[10] }}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary enroll-btn" 
-                            data-schedule-id="{{ course[3] }}"
-                            data-course-name="{{ course[1] }}">
-                        Enroll
-                    </button>
-                    <a href="{{ url_for('courses.prerequisites', course_id=course[0]) }}" 
-                       class="btn btn-sm btn-info">
-                        Prerequisites
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 
 <!-- Enrollment Modal -->

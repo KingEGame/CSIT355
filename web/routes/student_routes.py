@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from ..models import db, Student, StudentStatus, Schedule, Enrolled, EnrollmentStatus, Course, CourseLevel
 from datetime import datetime
+from flask_login import login_required, current_user
 
 students = Blueprint('students', __name__)
 
@@ -86,7 +87,7 @@ def available_courses():
     
     # Get all available courses for the student's level
     schedules = Schedule.query.join(Course).filter(
-        Schedule.current_enrollment < Schedule.max_capacity,
+        Schedule.current_enrollment < Schedule.max_enrollment,
         Course.level.in_(allowed_levels)
     ).all()
     
@@ -200,7 +201,7 @@ def register_course():
             })
         
         # Check course capacity
-        if schedule.current_enrollment >= schedule.max_capacity:
+        if schedule.current_enrollment >= schedule.max_enrollment:
             return jsonify({'success': False, 'message': 'Course is full'})
         
         # Check prerequisites
@@ -276,4 +277,38 @@ def drop_course():
     
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}) 
+        return jsonify({'success': False, 'message': str(e)})
+
+@students.route('/check-level-upgrade')
+@login_required
+def check_level_upgrade():
+    student = Student.query.get(current_user.id)
+    
+    if student.level.value == 'phd':
+        return jsonify({
+            'message': 'You are already at the highest academic level (PhD).'
+        })
+    
+    can_upgrade = student.can_upgrade_level()
+    current_gpa = student.get_gpa()
+    completed_credits = student.get_completed_credits()
+    
+    if student.level.value == 'undergraduate':
+        required_credits = 120
+        required_gpa = 3.0
+        next_level = 'graduate'
+    else:  # graduate
+        required_credits = 30
+        required_gpa = 3.5
+        next_level = 'phd'
+    
+    if can_upgrade and current_gpa >= required_gpa:
+        message = f'Congratulations! You are eligible to upgrade to {next_level} level.<br><br>'
+        message += f'Your GPA: {current_gpa:.2f} (Required: {required_gpa})<br>'
+        message += f'Completed Credits: {completed_credits} (Required: {required_credits})'
+    else:
+        message = f'You are not yet eligible to upgrade to {next_level} level.<br><br>'
+        message += f'Your GPA: {current_gpa:.2f} (Required: {required_gpa})<br>'
+        message += f'Completed Credits: {completed_credits} (Required: {required_credits})'
+    
+    return jsonify({'message': message}) 

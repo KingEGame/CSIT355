@@ -1,4 +1,4 @@
-from . import create_app
+from web import create_app
 
 # Create the Flask application for the CLI
 app = create_app()

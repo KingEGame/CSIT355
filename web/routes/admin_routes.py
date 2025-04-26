@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from ..models import db, Course, Professor, Schedule, Teaching, CourseLevel, Semester
 from datetime import datetime
+from web.models import Student
+from web.forms import StudentForm, ProfessorForm, CourseForm
 
 admin = Blueprint('admin', __name__)
 
@@ -15,18 +17,29 @@ def require_admin():
 
 @admin.route('/admin/dashboard')
 def dashboard():
+    total_students = db.session.query(db.func.count()).select_from(db.Model.metadata.tables['student']).scalar()
+    total_professors = db.session.query(db.func.count()).select_from(db.Model.metadata.tables['professor']).scalar()
+    total_courses = db.session.query(db.func.count()).select_from(db.Model.metadata.tables['courses']).scalar()
+    total_enrollments = db.session.query(db.func.count()).select_from(db.Model.metadata.tables['enrolled']).scalar()
+    stats = {
+        'total_students': total_students,
+        'active_courses': total_courses,  # No active field, so use total
+        'total_professors': total_professors,
+        'active_enrollments': total_enrollments  # No active field, so use total
+    }
     courses = Course.query.all()
     professors = Professor.query.all()
     schedules = Schedule.query.all()
     return render_template('admin/dashboard.html',
                          courses=courses,
                          professors=professors,
-                         schedules=schedules)
+                         schedules=schedules,
+                         stats=stats)
 
 @admin.route('/admin/courses')
 def list_courses():
     courses = Course.query.all()
-    return render_template('admin/courses.html', courses=courses)
+    return render_template('admin/course_list.html', courses=courses)
 
 @admin.route('/admin/course/new', methods=['GET', 'POST'])
 def create_course():
@@ -51,29 +64,6 @@ def create_course():
             flash(f'Error creating course: {str(e)}', 'error')
     
     return render_template('admin/course_form.html', course=None)
-
-@admin.route('/admin/course/<course_id>/edit', methods=['GET', 'POST'])
-def edit_course(course_id):
-    course = Course.query.get_or_404(course_id)
-    
-    if request.method == 'POST':
-        try:
-            course.course_code = request.form['course_code']
-            course.course_name = request.form['course_name']
-            course.description = request.form['description']
-            course.credits = int(request.form['credits'])
-            course.department = request.form['department']
-            course.level = CourseLevel[request.form['level']]
-            course.max_capacity = int(request.form['max_capacity'])
-            
-            db.session.commit()
-            flash('Course updated successfully', 'success')
-            return redirect(url_for('admin.list_courses'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating course: {str(e)}', 'error')
-    
-    return render_template('admin/course_form.html', course=course)
 
 @admin.route('/admin/schedule/new', methods=['GET', 'POST'])
 def create_schedule():
@@ -136,4 +126,97 @@ def remove_teaching():
         return jsonify({'success': False, 'message': 'Teaching assignment not found'})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}) 
+        return jsonify({'success': False, 'message': str(e)})
+
+@admin.route('/admin/students')
+def student_list():
+    students = Student.query.all()
+    return render_template('admin/student_list.html', students=students)
+
+@admin.route('/admin/students/add', methods=['GET', 'POST'])
+def add_student():
+    form = StudentForm()
+    if form.validate_on_submit():
+        student = Student(
+            student_id=request.form.get('student_id') or None,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data,
+            major=form.major.data,
+            status=form.status.data,
+            date_of_birth=datetime.now().date(),  # Placeholder, should be in form
+            enrollment_date=datetime.now().date(),
+            level=None  # Set as needed
+        )
+        db.session.add(student)
+        db.session.commit()
+        flash('Student added successfully!', 'success')
+        return redirect(url_for('admin.student_list'))
+    return render_template('admin/student_form.html', form=form)
+
+@admin.route('/admin/professors')
+def professor_list():
+    professors = Professor.query.all()
+    return render_template('admin/professor_list.html', professors=professors)
+
+@admin.route('/admin/professors/add', methods=['GET', 'POST'])
+def add_professor():
+    form = ProfessorForm()
+    return render_template('admin/professor_form.html', form=form)
+
+@admin.route('/admin/professors/<professor_id>/edit', methods=['GET', 'POST'])
+def edit_professor(professor_id):
+    professor = Professor.query.get_or_404(professor_id)
+    form = ProfessorForm(obj=professor)
+    return render_template('admin/professor_form.html', form=form, professor=professor)
+
+@admin.route('/admin/professors/<professor_id>/delete', methods=['POST'])
+def delete_professor(professor_id):
+    flash(f'Delete professor {professor_id} (not implemented)', 'warning')
+    return redirect(url_for('admin.professor_list'))
+
+@admin.route('/admin/courses')
+def course_list():
+    courses = Course.query.all()
+    return render_template('admin/course_list.html', courses=courses)
+
+@admin.route('/admin/courses/add', methods=['GET', 'POST'])
+def add_course():
+    form = CourseForm()
+    return render_template('admin/course_form.html', form=form)
+
+@admin.route('/admin/courses/<course_id>/edit', methods=['GET', 'POST'])
+def edit_course(course_id):
+    course = Course.query.get_or_404(course_id)
+    form = CourseForm(obj=course)
+    return render_template('admin/course_form.html', form=form, course=course)
+
+@admin.route('/admin/courses/<course_id>/delete', methods=['POST'])
+def delete_course(course_id):
+    flash(f'Delete course {course_id} (not implemented)', 'warning')
+    return redirect(url_for('admin.course_list'))
+
+@admin.route('/admin/teaching-assignments')
+def teaching_assignments():
+    teaching_data = {}  # TODO: Replace with real data
+    return render_template('admin/teaching_load.html', teaching_data=teaching_data)
+
+@admin.route('/admin/students/<student_id>/delete', methods=['POST'])
+def delete_student(student_id):
+    flash(f'Delete student {student_id} (not implemented)', 'warning')
+    return redirect(url_for('admin.student_list'))
+
+@admin.route('/admin/students/<student_id>/edit', methods=['GET', 'POST'])
+def edit_student(student_id):
+    student = Student.query.get_or_404(student_id)
+    form = StudentForm(obj=student)
+    if form.validate_on_submit():
+        student.first_name = form.first_name.data
+        student.last_name = form.last_name.data
+        student.email = form.email.data
+        student.major = form.major.data
+        student.status = form.status.data
+        db.session.commit()
+        flash('Student updated successfully!', 'success')
+        return redirect(url_for('admin.student_list'))
+    return render_template('admin/student_form.html', form=form, student=student) 

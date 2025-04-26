@@ -35,6 +35,12 @@ def login():
                 session['user_type'] = 'professor'
                 return redirect(url_for('professors.dashboard'))
             flash('Invalid professor ID or inactive account', 'error')
+        elif user_type == 'admin':
+            if user_id == 'admin':
+                session['user_type'] = 'admin'
+                session['admin_name'] = 'Administrator'
+                return redirect(url_for('admin.dashboard'))
+            flash('Invalid admin credentials', 'error')
         
         else:
             flash('Invalid user type', 'error')

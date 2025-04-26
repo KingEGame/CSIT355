@@ -37,19 +37,19 @@
                             <h3 class="text-lg font-medium text-gray-900">{{ course.course_code }} - {{ course.course_name }}</h3>
                             <div class="mt-1 text-sm text-gray-500">
                                 <p>Schedule: {{ course.schedule_time }}</p>
-                                <p>Room: {{ course.room }}</p>
-                                <p>Enrollment: {{ course.current_enrollment }}/{{ course.max_capacity }}</p>
+                                <p>Room: {{ course.room_number }}</p>
+                                <p>Enrollment: {{ course.current_enrollment }}/{{ course.max_enrollment }}</p>
                             </div>
                         </div>
                         <div class="flex space-x-4">
                             <button onclick="toggleSection('students-{{ course.course_id }}')" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
                                 Students
                             </button>
                             <button onclick="toggleSection('materials-{{ course.course_id }}')" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 Materials
@@ -100,7 +100,7 @@
                             <div class="flex justify-between items-center mb-4">
                                 <h4 class="text-lg font-medium text-gray-900">Course Materials</h4>
                                 <button onclick="showUploadModal('{{ course.course_id }}')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                     </svg>
                                     Upload Material
@@ -112,7 +112,7 @@
                                 <li class="py-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <svg class="h-5 w-5 text-gray-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                             <div>
@@ -138,7 +138,7 @@
             </div>
             {% else %}
             <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900">No courses</h3>

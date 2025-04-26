@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required
 from sqlalchemy import or_
 from datetime import datetime
-from web.models import db, Student, StudentStatus, Major, Schedule, Professor, Enrollment, Department, Course, CourseLevel
+from web.models import db, Student, StudentStatus, Schedule, Professor, Enrolled, Course, CourseLevel
 from web.forms import StudentForm, ProfessorForm, CourseForm
 from web.utils.decorators import admin_required
 from sqlalchemy.exc import IntegrityError
@@ -18,10 +18,10 @@ def current_year():
 def dashboard():
     stats = {
         'total_students': Student.query.count(),
-        'active_courses': Schedule.query.filter_by(year=current_year()).count(),
+        'active_courses': Schedule.query.filter_by(academic_year=current_year()).count(),
         'total_professors': Professor.query.count(),
-        'active_enrollments': Enrollment.query.join(Schedule).filter(
-            Schedule.year == current_year()
+        'active_enrollments': Enrolled.query.join(Schedule).filter(
+            Schedule.academic_year == current_year()
         ).count()
     }
     return render_template('admin/dashboard.html', stats=stats)
@@ -53,22 +53,25 @@ def student_list():
     if status:
         query = query.filter(Student.status == StudentStatus(status))
 
-    # Apply major filter
+    # Apply major filter (as substring)
     major = request.args.get('major')
     if major:
-        query = query.filter(Student.major == major)
+        query = query.filter(Student.major.ilike(f'%{major}%'))
 
     # Execute query with pagination
     pagination = query.order_by(Student.last_name).paginate(
         page=page, per_page=per_page, error_out=False
     )
 
+    # Build list of distinct majors for filter dropdown
+    majors = [m[0] for m in db.session.query(Student.major).distinct().all()]
+
     return render_template(
         'admin/student_list.html',
         students=pagination.items,
         pagination=pagination,
         student_statuses=StudentStatus,
-        majors=Major.query.all()
+        majors=majors
     )
 
 @admin.route('/students/add', methods=['GET', 'POST'])
@@ -82,7 +85,6 @@ def add_student():
             last_name=form.last_name.data,
             email=form.email.data,
             major=form.major.data,
-            level=form.level.data,
             status=StudentStatus.active
         )
         # Set password if provided
@@ -112,7 +114,6 @@ def edit_student(student_id):
         student.last_name = form.last_name.data
         student.email = form.email.data
         student.major = form.major.data
-        student.level = form.level.data
         student.status = form.status.data
 
         # Update password only if provided
@@ -201,10 +202,10 @@ def professor_list():
             )
         )
 
-    # Apply department filter
+    # Apply department filter (as substring)
     department = request.args.get('department')
     if department:
-        query = query.filter(Professor.department == Department(department))
+        query = query.filter(Professor.department.ilike(f'%{department}%'))
 
     # Apply status filter
     status = request.args.get('status')
@@ -216,11 +217,14 @@ def professor_list():
         page=page, per_page=per_page, error_out=False
     )
 
+    # Build plain-department list
+    departments = [d[0] for d in db.session.query(Professor.department).distinct().all()]
+
     return render_template(
         'admin/professor_list.html',
         professors=pagination.items,
         pagination=pagination,
-        departments=Department
+        departments=departments
     )
 
 @admin.route('/professors/add', methods=['GET', 'POST'])
@@ -321,12 +325,12 @@ def teaching_load():
     for professor in professors:
         current_courses = Schedule.query.filter_by(
             professor_id=professor.id,
-            year=current_year
+            academic_year=current_year
         ).count()
 
         teaching_data[professor.id] = {
             'name': f"{professor.first_name} {professor.last_name}",
-            'department': professor.department.value,
+            'department': professor.department,
             'current_courses': current_courses,
             'status': professor.status
         }
@@ -352,10 +356,10 @@ def course_list():
             )
         )
     
-    # Apply department filter
+    # Apply department filter (as substring)
     department = request.args.get('department')
     if department:
-        query = query.filter(Course.department == Department[department])
+        query = query.filter(Course.department.ilike(f'%{department}%'))
     
     # Apply level filter
     level = request.args.get('level')
@@ -369,11 +373,14 @@ def course_list():
         error_out=False
     )
     
+    # Build plain department list
+    departments = [d[0] for d in db.session.query(Course.department).distinct().all()]
+
     return render_template(
         'admin/course_list.html',
         courses=pagination.items,
         pagination=pagination,
-        departments=Department,
+        departments=departments,
         course_levels=CourseLevel
     )
 
@@ -389,7 +396,7 @@ def add_course():
                 code=form.code.data.upper(),
                 name=form.name.data,
                 description=form.description.data,
-                department=Department[form.department.data],
+                department=form.department.data,
                 level=CourseLevel[form.level.data],
                 credits=form.credits.data,
                 is_active=form.is_active.data
@@ -427,7 +434,7 @@ def edit_course(course_id):
             # Update basic course info
             form.populate_obj(course)
             course.code = course.code.upper()
-            course.department = Department[form.department.data]
+            course.department = form.department.data
             course.level = CourseLevel[form.level.data]
             
             # Update prerequisites

@@ -3,86 +3,69 @@
 {% block title %}Academic History{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="container-fluid py-4">
+    <div class="container">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Academic History</h1>
-            <p class="mt-2 text-gray-600">View your academic performance and course history.</p>
+        <div class="mb-4">
+            <h1 class="h2 fw-bold text-dark">Academic History</h1>
+            <p class="mt-2 text-muted">View your academic performance and course history.</p>
         </div>
 
         <!-- GPA Card -->
-        <div class="bg-white rounded-lg shadow-sm mb-8 p-6">
-            <div class="flex items-center justify-between">
+        <div class="bg-white rounded shadow-sm mb-4 p-4">
+            <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <h2 class="text-lg font-medium text-gray-900">Cumulative GPA</h2>
-                    <p class="text-sm text-gray-500">Based on completed courses</p>
+                    <h2 class="fs-6 fw-medium text-dark mb-1">Cumulative GPA</h2>
+                    <p class="small text-muted mb-0">Based on completed courses</p>
                 </div>
-                <div class="text-4xl font-bold {% if gpa >= 3.0 %}text-green-600{% elif gpa >= 2.0 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                <div class="display-4 fw-bold {% if gpa >= 3.0 %}text-success{% elif gpa >= 2.0 %}text-warning{% else %}text-danger{% endif %}">
                     {{ "%.2f"|format(gpa) }}
                 </div>
             </div>
         </div>
 
         <!-- Course History -->
-        <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-                <h3 class="text-lg font-medium text-gray-900">Course History</h3>
+        <div class="bg-white shadow-sm rounded overflow-hidden">
+            <div class="px-3 py-3 border-bottom">
+                <h3 class="fs-6 fw-medium text-dark mb-0">Course History</h3>
             </div>
 
             {% if enrollments %}
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Year/Semester
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Course
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Professor
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Credits
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Grade
-                            </th>
+                            <th>Year/Semester</th>
+                            <th>Course</th>
+                            <th>Professor</th>
+                            <th>Credits</th>
+                            <th>Grade</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {% for enrollment in enrollments %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ enrollment.schedule.year }} {{ enrollment.schedule.semester }}
+                        <tr>
+                            <td>{{ enrollment.schedule.academic_year }} {{ enrollment.schedule.semester }}</td>
+                            <td>
+                                <div class="fw-medium text-dark">{{ enrollment.schedule.course.course_code }}</div>
+                                <div class="small text-muted">{{ enrollment.schedule.course.course_name }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ enrollment.schedule.course.course_code }}</div>
-                                <div class="text-sm text-gray-500">{{ enrollment.schedule.course.course_name }}</div>
+                            <td>
+                                {% if enrollment.schedule.professors and enrollment.schedule.professors|length > 0 %}
+                                    Prof. {{ enrollment.schedule.professors[0].last_name }}
+                                {% else %}
+                                    <span class="text-muted">No professor assigned</span>
+                                {% endif %}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                Prof. {{ enrollment.schedule.professor.last_name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ enrollment.schedule.course.credits }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {% if enrollment.grade in ['A', 'A-'] %}
-                                        bg-green-100 text-green-800
-                                    {% elif enrollment.grade in ['B+', 'B', 'B-'] %}
-                                        bg-blue-100 text-blue-800
-                                    {% elif enrollment.grade in ['C+', 'C', 'C-'] %}
-                                        bg-yellow-100 text-yellow-800
-                                    {% elif enrollment.grade in ['D+', 'D'] %}
-                                        bg-orange-100 text-orange-800
-                                    {% elif enrollment.grade == 'F' %}
-                                        bg-red-100 text-red-800
-                                    {% else %}
-                                        bg-gray-100 text-gray-800
-                                    {% endif %}">
+                            <td class="small text-muted">{{ enrollment.schedule.course.credits }}</td>
+                            <td>
+                                <span class="badge rounded-pill 
+                                    {% if enrollment.grade in ['A', 'A-'] %}bg-success text-light
+                                    {% elif enrollment.grade in ['B+', 'B', 'B-'] %}bg-primary text-light
+                                    {% elif enrollment.grade in ['C+', 'C', 'C-'] %}bg-warning text-dark
+                                    {% elif enrollment.grade in ['D+', 'D'] %}bg-orange text-light
+                                    {% elif enrollment.grade == 'F' %}bg-danger text-light
+                                    {% else %}bg-secondary text-light{% endif %}">
                                     {{ enrollment.grade if enrollment.grade else 'N/A' }}
                                 </span>
                             </td>
@@ -92,39 +75,39 @@
                 </table>
             </div>
             {% else %}
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="text-center py-5">
+                <svg class="mx-auto icon-xl text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">No course history</h3>
-                <p class="mt-1 text-sm text-gray-500">Your completed courses will appear here.</p>
+                <h3 class="mt-2 small fw-medium text-dark">No course history</h3>
+                <p class="mt-1 small text-muted">Your completed courses will appear here.</p>
             </div>
             {% endif %}
         </div>
 
         <!-- Grade Scale Legend -->
-        <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-                <h3 class="text-lg font-medium text-gray-900">Grade Scale</h3>
+        <div class="mt-4 bg-white shadow-sm rounded overflow-hidden">
+            <div class="px-3 py-3 border-bottom">
+                <h3 class="fs-6 fw-medium text-dark mb-0">Grade Scale</h3>
             </div>
-            <div class="px-4 py-5 sm:p-6">
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            <div class="p-4">
+                <div class="row g-3">
                     {% for grade, points in [
                         ('A', '4.0'), ('A-', '3.7'),
                         ('B+', '3.3'), ('B', '3.0'), ('B-', '2.7'),
                         ('C+', '2.3'), ('C', '2.0'), ('C-', '1.7'),
                         ('D+', '1.3'), ('D', '1.0'), ('F', '0.0')
                     ] %}
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
-                            {% if grade.startswith('A') %}bg-green-100 text-green-800
-                            {% elif grade.startswith('B') %}bg-blue-100 text-blue-800
-                            {% elif grade.startswith('C') %}bg-yellow-100 text-yellow-800
-                            {% elif grade.startswith('D') %}bg-orange-100 text-orange-800
-                            {% else %}bg-red-100 text-red-800{% endif %}">
+                    <div class="col-6 col-sm-4 col-lg-2 d-flex align-items-center mb-2">
+                        <span class="badge rounded-pill 
+                            {% if grade.startswith('A') %}bg-success text-light
+                            {% elif grade.startswith('B') %}bg-primary text-light
+                            {% elif grade.startswith('C') %}bg-warning text-dark
+                            {% elif grade.startswith('D') %}bg-orange text-light
+                            {% else %}bg-danger text-light{% endif %} me-2">
                             {{ grade }}
                         </span>
-                        <span class="text-sm text-gray-500">{{ points }}</span>
+                        <span class="small text-muted">{{ points }}</span>
                     </div>
                     {% endfor %}
                 </div>

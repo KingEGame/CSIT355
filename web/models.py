@@ -59,11 +59,10 @@ class Student(db.Model):
     level = db.Column(db.Enum(CourseLevel), default=CourseLevel.undergraduate)
     enrollment_date = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    total_credits = db.Column(db.Integer, default=0)
     enrollments = db.relationship('Enrolled', backref='student', lazy=True)
-
     __table_args__ = (
         db.CheckConstraint("email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'", name='student_email_format_check'),
+        db.CheckConstraint("date_of_birth <= CURRENT_DATE - INTERVAL 16 YEAR", name='chk_student_dob'),
         db.Index('idx_student_email', 'email'),
         db.Index('idx_student_status', 'status')
     )
@@ -74,6 +73,53 @@ class Student(db.Model):
         from datetime import datetime, timedelta
         min_birth_date = datetime.now().date() - timedelta(days=16*365)
         return date_of_birth <= min_birth_date
+
+    def can_upgrade_level(self):
+        """Check if student can upgrade their academic level"""
+        if self.level == CourseLevel.undergraduate:
+            # Check if student has completed required credits for graduation
+            completed_credits = sum(
+                enrollment.schedule.course.credits 
+                for enrollment in self.enrollments 
+                if enrollment.status == EnrollmentStatus.completed
+            )
+            return completed_credits >= 120  # Typical undergraduate requirement
+        elif self.level == CourseLevel.graduate:
+            # Check if student has completed required graduate credits
+            completed_credits = sum(
+                enrollment.schedule.course.credits 
+                for enrollment in self.enrollments 
+                if enrollment.status == EnrollmentStatus.completed 
+                and enrollment.schedule.course.level == CourseLevel.graduate
+            )
+            return completed_credits >= 30  # Typical master's requirement
+        return False
+
+    def get_gpa(self):
+        """Calculate student's GPA"""
+        grade_points = {
+            'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+            'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+            'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+            'D+': 1.3, 'D': 1.0, 'F': 0.0
+        }
+        
+        completed_courses = [e for e in self.enrollments if e.grade in grade_points]
+        if not completed_courses:
+            return 0.0
+        
+        total_points = sum(grade_points[e.grade] * e.schedule.course.credits for e in completed_courses)
+        total_credits = sum(e.schedule.course.credits for e in completed_courses)
+        
+        return round(total_points / total_credits, 2) if total_credits > 0 else 0.0
+
+    def get_completed_credits(self):
+        """Get total completed credits"""
+        return sum(
+            enrollment.schedule.course.credits 
+            for enrollment in self.enrollments 
+            if enrollment.status == EnrollmentStatus.completed
+        )
 
 class Professor(db.Model):
     __tablename__ = 'professor'
@@ -92,6 +138,11 @@ class Professor(db.Model):
         db.Index('idx_professor_email', 'email'),
         db.Index('idx_professor_department', 'department')
     )
+
+    @property
+    def status(self):
+        from .models import ProfessorStatus  # avoid circular import if any
+        return ProfessorStatus.active
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -131,6 +182,7 @@ class Prerequisite(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint('course_id', 'prerequisite_course_id', name='unique_prerequisite'),
+        db.CheckConstraint('course_id != prerequisite_course_id', name='no_self_prerequisite'),
     )
 
     @staticmethod
@@ -148,24 +200,32 @@ class Schedule(db.Model):
     schedule_id = db.Column(db.String(10), primary_key=True)
     course_id = db.Column(db.String(10), db.ForeignKey('courses.course_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     semester = db.Column(db.Enum(Semester), nullable=False)
+    academic_year = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     meeting_days = db.Column(db.String(10), nullable=False)
     room_number = db.Column(db.String(10), nullable=False)
     current_enrollment = db.Column(db.Integer, default=0)
+    max_enrollment = db.Column(db.Integer, nullable=False)
     teaching_assignments = db.relationship('Teaching', backref='schedule', lazy=True)
     enrollments = db.relationship('Enrolled', backref='schedule', lazy=True)
-
+    professors = db.relationship(
+        'Professor',
+        secondary='teaching',
+        backref=db.backref('teaching_schedules', lazy='dynamic')
+    )
     __table_args__ = (
-        db.CheckConstraint("meeting_days REGEXP '^[MTWRF]+$'", name='chk_schedule_days'),
+        db.Index('idx_schedule_semester', 'semester', 'academic_year'),
         db.CheckConstraint('start_time < end_time', name='chk_schedule_time'),
-        db.Index('idx_schedule_semester', 'semester')
+        db.CheckConstraint("meeting_days REGEXP '^[MTWRF]+$'", name='chk_schedule_days'),
+        db.CheckConstraint('current_enrollment <= max_enrollment', name='chk_current_enrollment'),
+        db.CheckConstraint('academic_year >= YEAR(CURRENT_DATE)', name='chk_academic_year'),
     )
 
     def validate_enrollment_capacity(self):
         """Validate that current enrollment doesn't exceed course max capacity"""
-        if self.current_enrollment > self.course.max_capacity:
-            raise ValueError(f"Current enrollment ({self.current_enrollment}) cannot exceed course maximum capacity ({self.course.max_capacity})")
+        if self.current_enrollment > self.max_enrollment:
+            raise ValueError(f"Current enrollment ({self.current_enrollment}) cannot exceed schedule maximum enrollment ({self.max_enrollment})")
         return True
 
 class Enrolled(db.Model):
@@ -174,45 +234,31 @@ class Enrolled(db.Model):
     student_id = db.Column(db.String(10), db.ForeignKey('student.student_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     schedule_id = db.Column(db.String(10), db.ForeignKey('schedule.schedule_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     enrollment_date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
-    grade = db.Column(db.Enum(Grade))
+    grade = db.Column(db.String(2))
     status = db.Column(db.Enum(EnrollmentStatus), default=EnrollmentStatus.enrolled)
 
     __table_args__ = (
         db.UniqueConstraint('student_id', 'schedule_id', name='unique_enrollment'),
-        db.Index('idx_enrollment_status', 'status')
+        db.Index('idx_enrollment_status', 'status'),
+        db.CheckConstraint("grade IN ('A+','A','A-','B+','B','B-','C+','C','C-','D+','D','F','W','I')", name='chk_grade')
     )
 
 class Teaching(db.Model):
     __tablename__ = 'teaching'
     teaching_id = db.Column(db.String(10), primary_key=True)
-    professor_id = db.Column(db.String(10), db.ForeignKey('professor.professor_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-    schedule_id = db.Column(db.String(10), db.ForeignKey('schedule.schedule_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    professor_id = db.Column(db.String(10), db.ForeignKey('professor.professor_id'))
+    schedule_id = db.Column(db.String(10), db.ForeignKey('schedule.schedule_id'))
 
     __table_args__ = (
         db.UniqueConstraint('professor_id', 'schedule_id', name='unique_teaching_assignment'),
     )
 
-class CourseMaterial(db.Model):
-    __tablename__ = 'course_materials'
-
-    id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.String(10), db.ForeignKey('schedule.schedule_id'), nullable=False)
-    title = db.Column(db.String(255), nullable=False)
-    file_path = db.Column(db.String(255), nullable=False)
-    upload_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    # Relationships
-    course = db.relationship('Schedule', backref=db.backref('materials', lazy=True))
-
-    def __repr__(self):
-        return f'<CourseMaterial {self.title}>'
-
 # Modify the event listener to include capacity validation
 @db.event.listens_for(Enrolled, 'before_insert')
 def validate_enrollment_before_insert(mapper, connection, target):
     schedule = db.session.get(Schedule, target.schedule_id)
-    if schedule.current_enrollment >= schedule.course.max_capacity:
-        raise ValueError(f"Cannot enroll: Course has reached maximum capacity of {schedule.course.max_capacity}")
+    if schedule.current_enrollment >= schedule.max_enrollment:
+        raise ValueError(f"Cannot enroll: Course has reached maximum enrollment of {schedule.max_enrollment}")
 
 @db.event.listens_for(Enrolled, 'after_insert')
 def update_enrollment_count_after_insert(mapper, connection, target):
@@ -228,4 +274,15 @@ def update_enrollment_count_after_delete(mapper, connection, target):
         Schedule.__table__.update().
         where(Schedule.schedule_id == target.schedule_id).
         values(current_enrollment=Schedule.current_enrollment - 1)
-    ) 
+    )
+
+# Add ORM-level triggers to prevent self-prerequisites
+@db.event.listens_for(Prerequisite, 'before_insert')
+def validate_prerequisite_no_self_insert(mapper, connection, target):
+    if target.course_id == target.prerequisite_course_id:
+        raise ValueError('A course cannot be a prerequisite of itself')
+
+@db.event.listens_for(Prerequisite, 'before_update')
+def validate_prerequisite_no_self_update(mapper, connection, target):
+    if target.course_id == target.prerequisite_course_id:
+        raise ValueError('A course cannot be a prerequisite of itself') 

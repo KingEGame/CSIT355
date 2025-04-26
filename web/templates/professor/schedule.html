@@ -3,67 +3,66 @@
 {% block title %}Teaching Schedule{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="container-fluid py-4">
+    <div class="container">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Teaching Schedule</h1>
-            <p class="mt-2 text-gray-600">Your weekly class schedule and office hours</p>
+        <div class="mb-4">
+            <h1 class="h2 fw-bold text-dark">Teaching Schedule</h1>
+            <p class="mt-2 text-muted">Your weekly class schedule and office hours</p>
         </div>
 
         <!-- Office Hours Card -->
-        <div class="bg-white shadow rounded-lg p-6 mb-8">
-            <div class="flex items-center mb-4">
-                <svg class="h-6 w-6 text-indigo-600 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="bg-white shadow-sm rounded p-4 mb-4">
+            <div class="d-flex align-items-center mb-3">
+                <svg class="icon-lg text-primary me-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h2 class="text-xl font-semibold text-gray-900">Office Hours</h2>
+                <h2 class="fs-5 fw-semibold text-dark mb-0">Office Hours</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="row g-3">
                 {% for day, hours in office_hours.items() %}
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="font-medium text-gray-900">{{ day }}</h3>
-                    <p class="text-gray-600">{{ hours }}</p>
+                <div class="col-md-4">
+                    <div class="bg-light rounded p-3 mb-2">
+                        <h3 class="fw-medium text-dark mb-1">{{ day }}</h3>
+                        <p class="small text-muted mb-0">{{ hours }}</p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Weekly Schedule -->
-        <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-900">Weekly Schedule</h2>
+        <div class="bg-white shadow-sm rounded overflow-hidden mb-4">
+            <div class="px-3 py-3 border-bottom">
+                <h2 class="fs-5 fw-semibold text-dark mb-0">Weekly Schedule</h2>
             </div>
-            
             {% if schedule %}
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Time</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monday</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tuesday</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wednesday</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thursday</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Friday</th>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {% for time_slot in time_slots %}
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ time_slot }}
-                            </td>
+                            <td class="fw-medium text-dark">{{ time_slot }}</td>
                             {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
-                            <td class="px-6 py-4">
+                            <td>
                                 {% if schedule[day][time_slot] %}
                                 {% set course = schedule[day][time_slot] %}
-                                <div class="bg-indigo-50 rounded-lg p-3">
-                                    <div class="font-medium text-indigo-700">{{ course.course_code }}</div>
-                                    <div class="text-sm text-indigo-600">{{ course.course_name }}</div>
-                                    <div class="mt-1 text-xs text-indigo-500">
-                                        <span class="block">Room {{ course.room }}</span>
-                                        <span class="block">{{ course.current_enrollment }}/{{ course.max_capacity }} Students</span>
+                                <div class="bg-primary bg-opacity-10 rounded p-2 mb-2">
+                                    <div class="fw-medium text-primary">{{ course.course_code }}</div>
+                                    <div class="small text-primary">{{ course.course_name }}</div>
+                                    <div class="mt-1 small text-primary">
+                                        <span class="d-block">Room {{ course.room_number }}</span>
+                                        <span class="d-block">{{ course.current_enrollment }}/{{ course.max_enrollment }} Students</span>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -75,39 +74,39 @@
                 </table>
             </div>
             {% else %}
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="text-center py-5">
+                <svg class="mx-auto icon-xl text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">No classes scheduled</h3>
-                <p class="mt-1 text-sm text-gray-500">You have no classes scheduled for this semester.</p>
+                <h3 class="mt-2 small fw-medium text-dark">No classes scheduled</h3>
+                <p class="mt-1 small text-muted">You have no classes scheduled for this semester.</p>
             </div>
             {% endif %}
         </div>
 
         <!-- Legend -->
-        <div class="mt-8 bg-white shadow rounded-lg p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Legend</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-indigo-50 rounded mr-2"></div>
-                    <span class="text-sm text-gray-600">Regular Class Session</span>
+        <div class="mt-4 bg-white shadow-sm rounded p-4">
+            <h3 class="fs-6 fw-medium text-dark mb-3">Legend</h3>
+            <div class="row g-3">
+                <div class="col-md-4 d-flex align-items-center mb-2">
+                    <div class="rounded bg-primary bg-opacity-10 me-2" style="width: 1rem; height: 1rem;"></div>
+                    <span class="small text-muted">Regular Class Session</span>
                 </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-gray-50 rounded mr-2"></div>
-                    <span class="text-sm text-gray-600">Office Hours</span>
+                <div class="col-md-4 d-flex align-items-center mb-2">
+                    <div class="rounded bg-light me-2" style="width: 1rem; height: 1rem;"></div>
+                    <span class="small text-muted">Office Hours</span>
                 </div>
-                <div class="flex items-center">
-                    <div class="w-4 h-4 bg-white border-2 border-dashed border-gray-300 rounded mr-2"></div>
-                    <span class="text-sm text-gray-600">Available Time Slot</span>
+                <div class="col-md-4 d-flex align-items-center mb-2">
+                    <div class="rounded bg-white border border-dashed border-secondary me-2" style="width: 1rem; height: 1rem;"></div>
+                    <span class="small text-muted">Available Time Slot</span>
                 </div>
             </div>
         </div>
 
         <!-- Download Schedule Button -->
-        <div class="mt-8 flex justify-end">
-            <a href="{{ url_for('professors.download_schedule') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="mt-4 d-flex justify-content-end">
+            <a href="{{ url_for('professors.download_schedule') }}" class="btn btn-primary d-flex align-items-center">
+                <svg class="icon-md ms-n1 me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Download Schedule

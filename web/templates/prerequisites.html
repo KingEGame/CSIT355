@@ -1,46 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h2>Course Prerequisites</h2>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">{{ course.course_code }} - {{ course.course_name }}</h5>
-        <p class="text-muted mb-4">{{ course.description }}</p>
-        
-        {% if course.prerequisites.all() %}
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Course Code</th>
-                        <th>Course Name</th>
-                        <th>Description</th>
-                        <th>Credits</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for prereq in course.prerequisites %}
-                    <tr>
-                        <td>{{ prereq.course_code }}</td>
-                        <td>{{ prereq.course_name }}</td>
-                        <td>{{ prereq.description }}</td>
-                        <td>{{ prereq.credits }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="mb-4 d-flex align-items-center justify-content-between">
+            <h1 class="h2 fw-bold text-dark mb-0">Course Prerequisites</h1>
+            <a href="{{ url_for('courses.index') }}" class="btn btn-secondary">Back to Courses</a>
         </div>
-        {% else %}
-        <p class="text-muted">No prerequisites required for this course.</p>
-        {% endif %}
-
-        <div class="mt-3">
-            <a href="{{ url_for('courses.list_courses') }}" class="btn btn-primary">Back to Courses</a>
+        <div class="bg-white shadow-sm rounded p-4">
+            <h2 class="fs-5 fw-medium text-dark mb-3">Prerequisites for {{ course.course_code }} - {{ course.course_name }}</h2>
+            {% if prerequisites %}
+            <ul class="list-group list-group-flush mb-0">
+                {% for prereq in prerequisites %}
+                <li class="list-group-item d-flex align-items-center justify-content-between">
+                    <span class="fw-medium text-dark">{{ prereq.course_code }} - {{ prereq.course_name }}</span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ prereq.credits }} credits</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="text-center py-4">
+                <p class="small text-muted mb-0">No prerequisites for this course.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

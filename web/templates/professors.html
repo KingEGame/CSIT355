@@ -1,39 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h2>Professor Information</h2>
-    </div>
-</div>
-
-<div class="row">
-    {% set current_prof = namespace(id=None) %}
-    {% for prof in professors %}
-        {% if current_prof.id != prof[0] %}
-            {% if current_prof.id is not none %}
-                </div>
-            </div>
-            {% endif %}
-            {% set current_prof.id = prof[0] %}
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="mb-4 d-flex align-items-center justify-content-between">
+            <h1 class="h2 fw-bold text-dark mb-0">Professors</h1>
+        </div>
+        <div class="row g-3">
+            {% for professor in professors %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm rounded">
                     <div class="card-body">
-                        <h5 class="card-title">{{ prof[2] }} {{ prof[3] }}</h5>
-                        <p class="card-text">
-                            <strong>Department:</strong> {{ prof[4] }}<br>
-                            <strong>Professor ID:</strong> {{ prof[0] }}
-                        </p>
-                        <h6 class="mt-3">Teaching Courses:</h6>
-                        <ul class="list-group list-group-flush">
-        {% endif %}
-                            <li class="list-group-item">
-                                {{ prof[5] }}: {{ prof[6] }}
-                            </li>
-    {% endfor %}
-                        </ul>
+                        <h5 class="card-title fw-bold text-dark">{{ professor.first_name }} {{ professor.last_name }}</h5>
+                        <p class="card-text small text-muted mb-2">Department: {{ professor.department }}</p>
+                        <p class="card-text small text-muted mb-0">Email: <a href="mailto:{{ professor.email }}" class="text-primary">{{ professor.email }}</a></p>
                     </div>
                 </div>
             </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %} 

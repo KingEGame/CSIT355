@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Profile Settings{% endblock %}
+{% block title %}Professor Profile{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -74,6 +74,33 @@
                             {% if form.email.errors %}
                             <div class="mt-1 small text-danger">
                                 {{ form.email.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.office_number.label(class="form-label small fw-medium text-muted") }}
+                            {{ form.office_number(class="form-control") }}
+                            {% if form.office_number.errors %}
+                            <div class="mt-1 small text-danger">
+                                {{ form.office_number.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.phone.label(class="form-label small fw-medium text-muted") }}
+                            {{ form.phone(class="form-control") }}
+                            {% if form.phone.errors %}
+                            <div class="mt-1 small text-danger">
+                                {{ form.phone.errors[0] }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            {{ form.department.label(class="form-label small fw-medium text-muted") }}
+                            {{ form.department(class="form-control") }}
+                            {% if form.department.errors %}
+                            <div class="mt-1 small text-danger">
+                                {{ form.department.errors[0] }}
                             </div>
                             {% endif %}
                         </div>

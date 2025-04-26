@@ -1,32 +1,34 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from ..models import db, Professor, Course, Schedule, Teaching, Enrolled, Grade
 from datetime import datetime
+from ..forms import ProfessorForm
 
 professors_bp = Blueprint('professors', __name__)
 
 @professors_bp.route('/dashboard')
 def dashboard():
     if 'professor_id' not in session:
-        return redirect(url_for('auth_bp.index'))
+        return redirect(url_for('auth.index'))
     professor = Professor.query.get(session['professor_id'])
     teaching_assignments = Teaching.query.filter_by(professor_id=session['professor_id']).all()
-    return render_template('professors/dashboard.html', 
+    return render_template('professor/dashboard.html', 
                          professor=professor, 
                          teaching_assignments=teaching_assignments)
 
 @professors_bp.route('/courses')
 def my_courses():
     if 'professor_id' not in session:
-        return redirect(url_for('auth_bp.index'))
+        return redirect(url_for('auth.index'))
     teaching_assignments = Teaching.query.filter_by(professor_id=session['professor_id']).all()
     return render_template('professors/courses.html', teaching_assignments=teaching_assignments)
 
 @professors_bp.route('/profile')
 def profile():
     if 'professor_id' not in session:
-        return redirect(url_for('auth_bp.index'))
+        return redirect(url_for('auth.index'))
     professor = Professor.query.get(session['professor_id'])
-    return render_template('professors/profile.html', professor=professor)
+    form = ProfessorForm(obj=professor)
+    return render_template('professor/profile.html', professor=professor, form=form)
 
 @professors_bp.route('/professor/update-profile', methods=['POST'])
 def update_profile():
@@ -54,7 +56,7 @@ def update_profile():
 @professors_bp.route('/professor/course/<schedule_id>')
 def course_details(schedule_id):
     if 'professor_id' not in session:
-        return redirect(url_for('auth_bp.index'))
+        return redirect(url_for('auth.index'))
     
     schedule = Schedule.query.get(schedule_id)
     if not schedule:
