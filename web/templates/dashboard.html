@@ -10,6 +10,37 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col">
+            <h3>Current Enrollments</h3>
+            {% if enrollments %}
+            <ul class="list-group">
+                {% for enrollment in enrollments %}
+                <li class="list-group-item">
+                    <strong>{{ enrollment.schedule.course.course_name }}</strong>
+                    <span class="text-muted">({{ enrollment.schedule.course.course_code }})</span>
+                    <br>
+                    <small>{{ enrollment.schedule.meeting_days }} {{ enrollment.schedule.start_time.strftime('%H:%M') }} - {{ enrollment.schedule.end_time.strftime('%H:%M') }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No current enrollments.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h3>Credit Progress</h3>
+            <div class="progress" style="height: 20px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (completed_credits / 120) * 100 }}%;" aria-valuenow="{{ completed_credits }}" aria-valuemin="0" aria-valuemax="120">
+                    {{ completed_credits }}/120 credits
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4 mb-4">
             <div class="card h-100">
@@ -42,4 +73,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

@@ -92,5 +92,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+        <button id="close-notification">&times;</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const notification = document.getElementById('notification');
+            const message = document.getElementById('notification-message');
+            const closeBtn = document.getElementById('close-notification');
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const [category, text] = {{ messages|tojson }}[0];
+                message.textContent = text;
+                notification.classList.remove('hidden');
+                notification.classList.add(category);
+            {% endif %}
+            {% endwith %}
+
+            closeBtn.addEventListener('click', function() {
+                notification.classList.add('hidden');
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

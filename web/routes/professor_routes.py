@@ -3,9 +3,9 @@ from ..models import db, Professor, Course, Schedule, Teaching, Enrolled, Grade
 from datetime import datetime
 from ..forms import ProfessorForm
 
-professors_bp = Blueprint('professors', __name__)
+professors = Blueprint('professors', __name__)
 
-@professors_bp.route('/dashboard')
+@professors.route('/dashboard')
 def dashboard():
     if 'professor_id' not in session:
         return redirect(url_for('auth.index'))
@@ -15,22 +15,29 @@ def dashboard():
                          professor=professor, 
                          teaching_assignments=teaching_assignments)
 
-@professors_bp.route('/courses')
+@professors.route('/courses')
 def my_courses():
     if 'professor_id' not in session:
         return redirect(url_for('auth.index'))
     teaching_assignments = Teaching.query.filter_by(professor_id=session['professor_id']).all()
     return render_template('professors/courses.html', teaching_assignments=teaching_assignments)
 
-@professors_bp.route('/profile')
+@professors.route('/profile')
 def profile():
     if 'professor_id' not in session:
         return redirect(url_for('auth.index'))
+
     professor = Professor.query.get(session['professor_id'])
+    if not professor:
+        flash('Professor not found', 'error')
+        return redirect(url_for('auth.index'))
+
+    # Initialize the form with professor data
     form = ProfessorForm(obj=professor)
+
     return render_template('professor/profile.html', professor=professor, form=form)
 
-@professors_bp.route('/professor/update-profile', methods=['POST'])
+@professors.route('/professor/update-profile', methods=['POST'])
 def update_profile():
     if 'professor_id' not in session:
         return jsonify({'success': False, 'message': 'Not logged in'})
@@ -53,7 +60,7 @@ def update_profile():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
-@professors_bp.route('/professor/course/<schedule_id>')
+@professors.route('/professor/course/<schedule_id>')
 def course_details(schedule_id):
     if 'professor_id' not in session:
         return redirect(url_for('auth.index'))
@@ -70,7 +77,7 @@ def course_details(schedule_id):
                          schedule=schedule,
                          enrollments=enrollments)
 
-@professors_bp.route('/professor/update-grade', methods=['POST'])
+@professors.route('/professor/update-grade', methods=['POST'])
 def update_grade():
     if 'professor_id' not in session:
         return jsonify({'success': False, 'message': 'Not logged in'})
@@ -97,4 +104,4 @@ def update_grade():
         return jsonify({'success': True, 'message': 'Grade updated successfully'})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}) 
+        return jsonify({'success': False, 'message': str(e)})

@@ -186,4 +186,41 @@ For additional help:
 
 ## License
 
-This project is used for educational purposes at Montclair State University. 
+This project is used for educational purposes at Montclair State University.
+
+## Environment Variables Setup
+
+Create a `.env` file in the root directory with the following variables:
+
+```bash
+# Flask settings
+FLASK_ENV=development
+SECRET_KEY=your-secret-key-change-in-production
+SESSION_TYPE=filesystem
+PERMANENT_SESSION_LIFETIME=1800
+
+# Database configuration
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=csit_555
+DB_USER=db
+DB_PASSWORD=db
+DB_CHARSET=utf8mb4
+
+# Pool configuration
+DB_POOL_TIMEOUT=5
+DB_POOL_RECYCLE=3600
+DB_CONNECT_TIMEOUT=5
+
+# Upload configuration
+UPLOAD_FOLDER=uploads
+
+# Test database configuration (optional)
+TEST_DB_HOST=127.0.0.1
+TEST_DB_PORT=3306
+TEST_DB_NAME=csit_555_test
+TEST_DB_USER=db
+TEST_DB_PASSWORD=db
+```
+
+Note: Never commit the `.env` file to version control. The repository includes a `.env.example` file as a template. 

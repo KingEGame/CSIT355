@@ -2,9 +2,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
 
-auth_bp = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__)
 
-@auth_bp.route('/')
+@auth.route('/')
 def index():
     if 'student_id' in session:
         return redirect(url_for('students.dashboard'))
@@ -12,7 +12,7 @@ def index():
         return redirect(url_for('professors.dashboard'))
     return render_template('auth/login.html')
 
-@auth_bp.route('/login', methods=['GET', 'POST'])
+@auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         user_id = request.form.get('user_id')
@@ -47,13 +47,13 @@ def login():
     
     return render_template('auth/login.html')
 
-@auth_bp.route('/logout')
+@auth.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('auth.index'))
 
 # Registration routes can be added here if needed
-@auth_bp.route('/register/student', methods=['GET', 'POST'])
+@auth.route('/register/student', methods=['GET', 'POST'])
 def register_student():
     if request.method == 'POST':
         try:
@@ -76,7 +76,7 @@ def register_student():
     
     return render_template('auth/register_student.html')
 
-@auth_bp.route('/register/professor', methods=['GET', 'POST'])
+@auth.route('/register/professor', methods=['GET', 'POST'])
 def register_professor():
     if request.method == 'POST':
         try:

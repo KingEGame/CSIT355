@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from ..models import db, Student, StudentStatus, Schedule, Enrolled, EnrollmentStatus, Course, CourseLevel
+from ..models import db, Student, StudentStatus, Schedule, Enrolled, EnrollmentStatus, Course, CourseLevel, Semester
 from datetime import datetime
 from flask_login import login_required, current_user
+from ..forms import StudentForm
 
 students = Blueprint('students', __name__)
 
@@ -9,13 +10,16 @@ students = Blueprint('students', __name__)
 def profile():
     if 'student_id' not in session:
         return redirect(url_for('auth.login'))
-    
+
     student = Student.query.get(session['student_id'])
     if not student:
         flash('Student not found', 'error')
         return redirect(url_for('auth.login'))
-    
-    return render_template('student/profile.html', student=student)
+
+    # Initialize the form with student data
+    form = StudentForm(obj=student)
+
+    return render_template('student/profile.html', student=student, form=form)
 
 @students.route('/student/update-profile', methods=['POST'])
 def update_profile():
@@ -42,18 +46,29 @@ def update_profile():
 def dashboard():
     if 'student_id' not in session:
         return redirect(url_for('auth.login'))
-    
+
     student = Student.query.get(session['student_id'])
     if not student:
         flash('Student not found', 'error')
         return redirect(url_for('auth.login'))
-    
-    # Get current enrollments
-    current_enrollments = student.enrollments
-    
+
+    # Get current enrollments excluding dropped courses
+    current_enrollments = Enrolled.query.filter(
+        Enrolled.student_id == session['student_id'],
+        Enrolled.status == EnrollmentStatus.enrolled
+    ).all()
+
+    # Calculate completed credits
+    completed_credits = sum(
+        enrollment.schedule.course.credits
+        for enrollment in student.enrollments
+        if enrollment.status == EnrollmentStatus.completed
+    )
+
     return render_template('student/dashboard.html', 
-                         student=student,
-                         enrollments=current_enrollments)
+                           student=student, 
+                           enrollments=current_enrollments, 
+                           completed_credits=completed_credits)
 
 @students.route('/student/academic-history')
 def academic_history():
@@ -67,10 +82,22 @@ def academic_history():
     
     # Get completed courses with grades
     completed_courses = [e for e in student.enrollments if e.grade is not None]
-    
+
+    # Calculate GPA
+    grade_points = {
+        'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+        'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+        'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+        'D+': 1.3, 'D': 1.0, 'F': 0.0
+    }
+    total_points = sum(grade_points.get(e.grade, 0) * e.schedule.course.credits for e in completed_courses)
+    total_credits = sum(e.schedule.course.credits for e in completed_courses)
+    gpa = round(total_points / total_credits, 2) if total_credits > 0 else 0.0
+
     return render_template('student/academic_history.html',
-                         student=student,
-                         completed_courses=completed_courses)
+                           student=student,
+                           completed_courses=completed_courses,
+                           gpa=gpa)
 
 @students.route('/student/available-courses')
 def available_courses():
@@ -147,81 +174,39 @@ def get_current_semester():
 @students.route('/student/register-course', methods=['POST'])
 def register_course():
     if 'student_id' not in session:
-        return jsonify({'success': False, 'message': 'Not logged in'})
-    
+        flash('You must be logged in to register for a course.', 'error')
+        return redirect(url_for('auth.login'))
+
     schedule_id = request.form.get('schedule_id')
-    
+
     try:
         student = Student.query.get(session['student_id'])
         if not student:
-            return jsonify({'success': False, 'message': 'Student not found'})
-        
+            flash('Student not found.', 'error')
+            return redirect(url_for('students.available_courses'))
+
         # Check if already enrolled
         existing_enrollment = Enrolled.query.filter_by(
             student_id=session['student_id'],
             schedule_id=schedule_id
         ).first()
-        
+
         if existing_enrollment:
-            return jsonify({'success': False, 'message': 'Already enrolled in this course'})
-        
+            if existing_enrollment.status == EnrollmentStatus.dropped:
+                # Allow re-registration by updating the status
+                existing_enrollment.status = EnrollmentStatus.enrolled
+                db.session.commit()
+                flash('Successfully re-registered for the course.', 'success')
+                return redirect(url_for('students.dashboard'))
+            flash('You are already enrolled in this course.', 'error')
+            return redirect(url_for('students.available_courses'))
+
         # Get course and schedule information
         schedule = Schedule.query.get(schedule_id)
         if not schedule:
-            return jsonify({'success': False, 'message': 'Course schedule not found'})
-        
-        course = Course.query.get(schedule.course_id)
+            flash('Course schedule not found.', 'error')
+            return redirect(url_for('students.available_courses'))
 
-        # Check if student has already completed this course
-        completed_enrollment = Enrolled.query.join(Schedule).filter(
-            Enrolled.student_id == session['student_id'],
-            Schedule.course_id == course.course_id,
-            Enrolled.status == EnrollmentStatus.completed
-        ).first()
-        
-        if completed_enrollment:
-            return jsonify({
-                'success': False,
-                'message': 'You have already completed this course and cannot take it again'
-            })
-        
-        # Check course level restrictions
-        allowed_levels = get_allowed_course_levels(student.level)
-        if course.level not in allowed_levels:
-            return jsonify({
-                'success': False,
-                'message': f'This course is not available for {student.level.value} students'
-            })
-        
-        # Check credit limits
-        if not check_credit_limits(student, course):
-            return jsonify({
-                'success': False,
-                'message': 'Enrolling in this course would exceed your credit limit for the semester'
-            })
-        
-        # Check course capacity
-        if schedule.current_enrollment >= schedule.max_enrollment:
-            return jsonify({'success': False, 'message': 'Course is full'})
-        
-        # Check prerequisites
-        if course.prerequisites:
-            # Get student's completed courses
-            completed_courses = Enrolled.query.filter_by(
-                student_id=session['student_id'],
-                status=EnrollmentStatus.completed
-            ).all()
-            completed_course_ids = [e.schedule.course_id for e in completed_courses]
-            
-            # Check if all prerequisites are met
-            for prereq in course.prerequisites:
-                if prereq.prerequisite_course_id not in completed_course_ids:
-                    prereq_course = Course.query.get(prereq.prerequisite_course_id)
-                    return jsonify({
-                        'success': False,
-                        'message': f'Missing prerequisite: {prereq_course.course_code}'
-                    })
-        
         # Create new enrollment
         enrollment = Enrolled(
             student_id=session['student_id'],
@@ -229,55 +214,55 @@ def register_course():
             enrollment_date=datetime.utcnow(),
             status=EnrollmentStatus.enrolled
         )
-        
+
         db.session.add(enrollment)
-        
-        # Update student's total credits for completed courses
-        if student.total_credits is None:
-            student.total_credits = 0
-        student.total_credits += course.credits
-        
         db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'message': 'Successfully registered for the course',
-            'credits': course.credits,
-            'total_credits': student.total_credits
-        })
-    
+
+        flash('Course registered successfully.', 'success')
+        return redirect(url_for('students.dashboard'))
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)})
+        flash(f'Error registering for the course: {str(e)}', 'error')
+        return redirect(url_for('students.available_courses'))
 
 @students.route('/student/drop-course', methods=['POST'])
 def drop_course():
     if 'student_id' not in session:
-        return jsonify({'success': False, 'message': 'Not logged in'})
-    
+        flash('You must be logged in to drop a course.', 'error')
+        return redirect(url_for('auth.login'))
+
     enrollment_id = request.form.get('enrollment_id')
-    
+
+    if not enrollment_id:
+        flash('Enrollment ID is required to drop a course.', 'error')
+        return redirect(url_for('students.dashboard'))
+
     try:
         enrollment = Enrolled.query.filter_by(
             enrollment_id=enrollment_id,
             student_id=session['student_id']
         ).first()
-        
+
         if not enrollment:
-            return jsonify({'success': False, 'message': 'Enrollment not found'})
-        
+            flash('Enrollment not found.', 'error')
+            return redirect(url_for('students.dashboard'))
+
         # Check if it's within the drop period (you can add your own logic here)
         if enrollment.status != EnrollmentStatus.enrolled:
-            return jsonify({'success': False, 'message': 'Cannot drop this course at this time'})
-        
+            flash('Cannot drop this course at this time.', 'error')
+            return redirect(url_for('students.dashboard'))
+
         enrollment.status = EnrollmentStatus.dropped
         db.session.commit()
-        
-        return jsonify({'success': True, 'message': 'Successfully dropped the course'})
-    
+
+        flash('Course successfully dropped.', 'success')
+        return redirect(url_for('students.dashboard'))
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)})
+        flash(f'Error dropping the course: {str(e)}', 'error')
+        return redirect(url_for('students.dashboard'))
 
 @students.route('/check-level-upgrade')
 @login_required
@@ -311,4 +296,22 @@ def check_level_upgrade():
         message += f'Your GPA: {current_gpa:.2f} (Required: {required_gpa})<br>'
         message += f'Completed Credits: {completed_credits} (Required: {required_credits})'
     
-    return jsonify({'message': message}) 
+    return jsonify({'message': message})
+
+@students.route('/student/schedule')
+def schedule():
+    if 'student_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    student = Student.query.get(session['student_id'])
+    if not student:
+        flash('Student not found', 'error')
+        return redirect(url_for('auth.login'))
+
+    # Get current enrollments excluding dropped courses
+    current_enrollments = Enrolled.query.filter_by(
+        student_id=session['student_id'],
+        status=EnrollmentStatus.enrolled
+    ).all()
+
+    return render_template('student/schedule.html', enrollments=current_enrollments)

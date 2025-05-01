@@ -27,4 +27,28 @@ document.addEventListener('DOMContentLoaded', function() {
             form.classList.add('was-validated');
         });
     });
-}); 
+
+    // Handle 'Drop Course' form submission
+    const dropCourseForms = document.querySelectorAll('form[action$="/student/drop-course"]');
+
+    dropCourseForms.forEach(form => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+                window.location.href = '/student/dashboard';
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+        });
+    });
+});

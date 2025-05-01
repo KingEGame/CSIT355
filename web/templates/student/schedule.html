@@ -1,51 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}Class Schedule{% endblock %}
+{% block title %}Student Schedule{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="container">
-        <!-- Header -->
         <div class="mb-4">
-            <h1 class="h2 fw-bold text-dark">Class Schedule</h1>
-            <p class="mt-2 text-muted">Your weekly class schedule for the current semester.</p>
+            <h1 class="h2 fw-bold text-dark">Weekly Schedule</h1>
+            <p class="mt-2 text-muted">Here is your schedule for the week.</p>
         </div>
 
-        <!-- Schedule Grid -->
-        <div class="bg-white shadow-sm rounded overflow-hidden">
+        <div class="bg-white shadow-sm rounded mb-4">
             <div class="px-3 py-3 border-bottom">
-                <h3 class="fs-6 fw-medium text-dark mb-0">Weekly Schedule</h3>
+                <h2 class="fs-5 fw-medium text-dark">Schedule</h2>
             </div>
-
-            {% if any(schedule.values()) %}
             <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
                             <th>Time</th>
-                            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
-                            <th>{{ day }}</th>
-                            {% endfor %}
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for time in time_slots %}
+                        {% for hour in range(8, 18) %}
                         <tr>
-                            <td class="small text-muted">{{ time }}</td>
-                            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                            <td>{{ hour }}:00 - {{ hour + 1 }}:00</td>
+                            {% for day in ['M', 'T', 'W', 'R', 'F'] %}
                             <td>
-                                {% for enrollment in schedule[day] %}
-                                    {% set start_time = enrollment.schedule.schedule_time.split(' - ')[0].split(' ', 1)[1] %}
-                                    {% if start_time == time %}
-                                    <div class="rounded bg-primary bg-opacity-10 p-2 mb-2 border border-primary border-opacity-25">
-                                        <div class="fw-medium text-primary">{{ enrollment.schedule.course.course_code }}</div>
-                                        <div class="small text-primary">{{ enrollment.schedule.course.course_name }}</div>
-                                        <div class="mt-1 small text-primary">
-                                            Room {{ enrollment.schedule.room_number }}
-                                        </div>
-                                        <div class="mt-1 small text-primary">
-                                            {{ enrollment.schedule.meeting_days }} {{ enrollment.schedule.start_time.strftime('%H:%M') }} - {{ enrollment.schedule.end_time.strftime('%H:%M') }}
-                                        </div>
+                                {% for enrollment in enrollments %}
+                                    {% if day in enrollment.schedule.meeting_days and hour == enrollment.schedule.start_time.hour %}
+                                    <div class="bg-primary text-white p-2 rounded">
+                                        <strong>{{ enrollment.schedule.course.course_code }}</strong><br>
+                                        {{ enrollment.schedule.course.course_name }}<br>
+                                        Room: {{ enrollment.schedule.room_number }}
                                     </div>
                                     {% endif %}
                                 {% endfor %}
@@ -56,33 +48,7 @@
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <div class="text-center py-5">
-                <svg class="mx-auto icon-md text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h3 class="mt-2 small fw-medium text-dark">No classes scheduled</h3>
-                <p class="mt-1 small text-muted">Register for courses to see your schedule here.</p>
-                <div class="mt-4">
-                    <a href="{{ url_for('students.available_courses') }}" class="btn btn-primary btn-sm">Browse Courses</a>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Legend -->
-        <div class="mt-4 bg-white shadow-sm rounded overflow-hidden">
-            <div class="p-3">
-                <h3 class="fs-6 fw-medium text-dark mb-3">Schedule Information</h3>
-                <div class="mb-3 d-flex align-items-center">
-                    <div class="rounded bg-primary bg-opacity-10 me-2" style="width: 1rem; height: 1rem;"></div>
-                    <span class="small text-muted">Class Session</span>
-                </div>
-                <p class="small text-muted mb-0">
-                    * Schedule shows regular class meetings. Check course syllabus for additional sessions or changes.
-                </p>
-            </div>
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

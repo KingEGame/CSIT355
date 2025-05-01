@@ -35,12 +35,12 @@ INSERT INTO schedule (schedule_id, course_id, semester, start_time, end_time, me
 ('SCH105', 'CRS005', 'Fall', '10:30:00', '11:45:00', 'MWF', 'CH-101', 2025, 30, 0);
 
 -- Test data for enrolled table
-INSERT INTO enrolled (enrollment_id, student_id, schedule_id, enrollment_date, grade, status) VALUES
-('ENR001', 'ST001', 'SCH101', '2025-08-25', NULL, 'enrolled'),
-('ENR002', 'ST001', 'SCH102', '2025-08-25', NULL, 'enrolled'),
-('ENR003', 'ST002', 'SCH103', '2025-08-26', NULL, 'enrolled'),
-('ENR004', 'ST003', 'SCH104', '2025-08-26', NULL, 'enrolled'),
-('ENR005', 'ST005', 'SCH101', '2025-08-27', NULL, 'enrolled');
+INSERT INTO enrolled (student_id, schedule_id, enrollment_date, grade, status) VALUES
+('ST001', 'SCH101', '2025-08-25', NULL, 'enrolled'),
+('ST001', 'SCH102', '2025-08-25', NULL, 'enrolled'),
+('ST002', 'SCH103', '2025-08-26', NULL, 'enrolled'),
+('ST003', 'SCH104', '2025-08-26', NULL, 'enrolled'),
+('ST005', 'SCH101', '2025-08-27', NULL, 'enrolled');
 
 -- Test data for teaching table
 INSERT INTO teaching (teaching_id, professor_id, schedule_id) VALUES

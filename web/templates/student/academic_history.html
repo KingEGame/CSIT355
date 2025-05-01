@@ -8,7 +8,7 @@
         <!-- Header -->
         <div class="mb-4">
             <h1 class="h2 fw-bold text-dark">Academic History</h1>
-            <p class="mt-2 text-muted">View your academic performance and course history.</p>
+            <p class="mt-2 text-muted">Here is a record of your completed courses and grades.</p>
         </div>
 
         <!-- GPA Card -->
@@ -85,6 +85,37 @@
             {% endif %}
         </div>
 
+        <!-- Completed Courses -->
+        {% if completed_courses %}
+        <div class="bg-white shadow-sm rounded mb-4">
+            <div class="px-3 py-3 border-bottom">
+                <h2 class="fs-5 fw-medium text-dark">Completed Courses</h2>
+            </div>
+            <div class="border-top">
+                {% for enrollment in completed_courses %}
+                <div class="px-3 py-3 border-bottom d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <h3 class="fs-6 fw-medium text-dark mb-1">
+                            {{ enrollment.schedule.course.course_code }} - {{ enrollment.schedule.course.course_name }}
+                        </h3>
+                        <div class="d-flex align-items-center small text-muted">
+                            <span>Grade: {{ enrollment.grade }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="px-3 py-5 text-center">
+            <svg class="mx-auto icon-md text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2" />
+            </svg>
+            <h3 class="mt-2 small fw-medium text-dark">No completed courses</h3>
+            <p class="mt-1 small text-muted">You have not completed any courses yet.</p>
+        </div>
+        {% endif %}
+
         <!-- Grade Scale Legend -->
         <div class="mt-4 bg-white shadow-sm rounded overflow-hidden">
             <div class="px-3 py-3 border-bottom">
@@ -115,4 +146,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

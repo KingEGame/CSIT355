@@ -164,4 +164,40 @@ svg[class*="icon-"] {
     display: inline-block;
     vertical-align: middle;
     fill: currentColor;
-} 
+}
+
+/* Notification Styles */
+#notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#notification.hidden {
+    display: none;
+}
+
+#notification.success {
+    background-color: #4caf50;
+    color: white;
+}
+
+#notification.error {
+    background-color: #f44336;
+    color: white;
+}
+
+#close-notification {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}

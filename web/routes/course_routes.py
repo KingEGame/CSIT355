@@ -2,29 +2,29 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..models import db, Course, Schedule, Enrolled, Prerequisite
 from datetime import datetime
 
-courses_bp = Blueprint('courses', __name__)
+courses = Blueprint('courses', __name__)
 
-@courses_bp.route('/dashboard')
+@courses.route('/dashboard')
 def index():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
     return render_template('dashboard.html', student_name=session['student_name'])
 
-@courses_bp.route('/courses')
+@courses.route('/courses')
 def list_courses():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
     schedules = Schedule.query.all()
     return render_template('courses.html', courses=schedules)
 
-@courses_bp.route('/my-courses')
+@courses.route('/my-courses')
 def my_courses():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
     enrollments = Enrolled.query.filter_by(student_id=session['student_id']).all()
     return render_template('my_courses.html', courses=enrollments)
 
-@courses_bp.route('/enroll', methods=['POST'])
+@courses.route('/enroll', methods=['POST'])
 def enroll():
     if 'student_id' not in session:
         return jsonify({'success': False, 'message': 'Not logged in'})
@@ -42,7 +42,7 @@ def enroll():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
-@courses_bp.route('/withdraw', methods=['POST'])
+@courses.route('/withdraw', methods=['POST'])
 def withdraw():
     if 'student_id' not in session:
         return jsonify({'success': False, 'message': 'Not logged in'})
@@ -62,7 +62,7 @@ def withdraw():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
-@courses_bp.route('/search')
+@courses.route('/search')
 def search():
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))
@@ -73,7 +73,7 @@ def search():
     ).all()
     return render_template('search.html', courses=schedules, search_term=search_term)
 
-@courses_bp.route('/prerequisites/<course_id>')
+@courses.route('/prerequisites/<course_id>')
 def prerequisites(course_id):
     if 'student_id' not in session:
         return redirect(url_for('auth.index'))

@@ -60,6 +60,7 @@ class Student(db.Model):
     enrollment_date = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     enrollments = db.relationship('Enrolled', backref='student', lazy=True)
+    total_credits = db.Column(db.Integer, default=0, nullable=False)
     __table_args__ = (
         db.CheckConstraint("email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'", name='student_email_format_check'),
         db.CheckConstraint("date_of_birth <= CURRENT_DATE - INTERVAL 16 YEAR", name='chk_student_dob'),
@@ -230,7 +231,7 @@ class Schedule(db.Model):
 
 class Enrolled(db.Model):
     __tablename__ = 'enrolled'
-    enrollment_id = db.Column(db.String(10), primary_key=True)
+    enrollment_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     student_id = db.Column(db.String(10), db.ForeignKey('student.student_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     schedule_id = db.Column(db.String(10), db.ForeignKey('schedule.schedule_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     enrollment_date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
@@ -285,4 +286,4 @@ def validate_prerequisite_no_self_insert(mapper, connection, target):
 @db.event.listens_for(Prerequisite, 'before_update')
 def validate_prerequisite_no_self_update(mapper, connection, target):
     if target.course_id == target.prerequisite_course_id:
-        raise ValueError('A course cannot be a prerequisite of itself') 
+        raise ValueError('A course cannot be a prerequisite of itself')

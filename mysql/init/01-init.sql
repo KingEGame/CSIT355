@@ -89,7 +89,7 @@ CREATE TABLE schedule (
 
 -- Create enrolled table 
 CREATE TABLE enrolled (
-    enrollment_id VARCHAR(10) PRIMARY KEY,
+    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id VARCHAR(10) NOT NULL,
     schedule_id VARCHAR(10) NOT NULL,
     enrollment_date DATE NOT NULL DEFAULT (CURRENT_DATE),
