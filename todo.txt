@@ -12,7 +12,6 @@ prerequisite display
 no course prerequisite on course enrollment
 
 duplicate enrollment verification
-Professor implement teacher teaching load - WILL
 
 schedule conlfict resolution
 TokenValidation for course enroll - ILIAN
