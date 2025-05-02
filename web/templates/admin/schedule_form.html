@@ -1,0 +1,46 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Schedule Form - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{{ form_title if form_title else 'Create/Edit Schedule' }}</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="course_id" class="form-label">Course</label>
+            <select class="form-select" id="course_id" name="course_id" required>
+                <option value="">Select a course</option>
+                {% for course in courses %}
+                    <option value="{{ course.course_id }}" {% if schedule and schedule.course_id == course.course_id %}selected{% endif %}>{{ course.course_code }} - {{ course.course_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="semester" class="form-label">Semester</label>
+            <select class="form-select" id="semester" name="semester" required>
+                <option value="">Select a semester</option>
+                {% for sem in Semester %}
+                    <option value="{{ sem.name }}" {% if schedule and schedule.semester and schedule.semester.name == sem.name %}selected{% endif %}>{{ sem.value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="meeting_days" class="form-label">Meeting Days</label>
+            <input type="text" class="form-control" id="meeting_days" name="meeting_days" placeholder="e.g. Mon/Wed/Fri" value="{{ schedule.meeting_days if schedule and schedule.meeting_days else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="start_time" class="form-label">Start Time</label>
+            <input type="time" class="form-control" id="start_time" name="start_time" value="{{ schedule.start_time if schedule and schedule.start_time else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="end_time" class="form-label">End Time</label>
+            <input type="time" class="form-control" id="end_time" name="end_time" value="{{ schedule.end_time if schedule and schedule.end_time else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="room_number" class="form-label">Room</label>
+            <input type="text" class="form-control" id="room_number" name="room_number" value="{{ schedule.room_number if schedule and schedule.room_number else '' }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %} 

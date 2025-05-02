@@ -1,0 +1,43 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Course Schedules - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Course Schedules</h1>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table table-striped">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Semester</th>
+                        <th>Meeting Days</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Room</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                        <tr>
+                            <td>{{ courses[schedule.course_id].course_code if schedule.course_id in courses else '' }}</td>
+                            <td>{{ courses[schedule.course_id].course_name if schedule.course_id in courses else '' }}</td>
+                            <td>{{ schedule.semester.value if schedule.semester else '' }}</td>
+                            <td>{{ schedule.meeting_days }}</td>
+                            <td>{{ schedule.start_time.strftime('%H:%M') if schedule.start_time else '' }}</td>
+                            <td>{{ schedule.end_time.strftime('%H:%M') if schedule.end_time else '' }}</td>
+                            <td>{{ schedule.room_number }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No schedules found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

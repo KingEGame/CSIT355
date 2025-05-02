@@ -3,25 +3,21 @@
 {% block title %}{{ title }} - Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100 py-8 px-4 md:px-8">
+<div class="container py-4">
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="fixed bottom-4 right-4 z-50">
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
                 {% for category, message in messages %}
-                    <div class="flex items-center p-4 mb-4 rounded-lg {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}">
-                        <span class="mr-2">
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} d-flex align-items-center" role="alert">
+                        <div class="me-2">
                             {% if category == 'success' %}
-                                <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
+                                <i class="bi bi-check-circle-fill text-success"></i>
                             {% else %}
-                                <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
+                                <i class="bi bi-x-circle-fill text-danger"></i>
                             {% endif %}
-                        </span>
-                        {{ message }}
+                        </div>
+                        <div>{{ message }}</div>
                     </div>
                 {% endfor %}
             </div>
@@ -29,156 +25,99 @@
     {% endwith %}
 
     <!-- Header -->
-    <div class="mb-8">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
-                <p class="mt-2 text-gray-600">
-                    {% if course %}
-                        Update information for {{ course.code }} - {{ course.name }}
-                    {% else %}
-                        Add a new course to the system
-                    {% endif %}
-                </p>
-            </div>
-            <a href="{{ url_for('admin.course_list') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Back to List
-            </a>
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="display-6 fw-bold">{{ title or (course and 'Edit Course') or 'Add Course' }}</h1>
+            <p class="text-muted">
+                {% if course %}
+                    Update information for {{ course.code }} - {{ course.name }}
+                {% else %}
+                    Add a new course to the system
+                {% endif %}
+            </p>
         </div>
+        <a href="{{ url_for('admin.course_list') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
     </div>
 
     <!-- Form -->
-    <div class="bg-white rounded-lg shadow px-6 py-8">
-        <form method="POST" class="space-y-6">
-            {{ form.csrf_token }}
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Course Code -->
-                <div>
-                    {{ form.code.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.code(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md") }}
-                        {% if form.code.errors %}
-                            {% for error in form.code.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Course Name -->
-                <div>
-                    {{ form.name.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.name(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md") }}
-                        {% if form.name.errors %}
-                            {% for error in form.name.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Department -->
-                <div>
-                    {{ form.department.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.department(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md") }}
-                        {% if form.department.errors %}
-                            {% for error in form.department.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Level -->
-                <div>
-                    {{ form.level.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.level(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md") }}
-                        {% if form.level.errors %}
-                            {% for error in form.level.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Credits -->
-                <div>
-                    {{ form.credits.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.credits(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md") }}
-                        {% if form.credits.errors %}
-                            {% for error in form.credits.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Prerequisites -->
-                <div>
-                    {{ form.prerequisites.label(class="block text-sm font-medium text-gray-700") }}
-                    <div class="mt-1">
-                        {{ form.prerequisites(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md") }}
-                        {% if form.prerequisites.errors %}
-                            {% for error in form.prerequisites.errors %}
-                                <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-                        <p class="mt-1 text-sm text-gray-500">Enter course codes separated by commas</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Description -->
-            <div class="mt-6">
-                {{ form.description.label(class="block text-sm font-medium text-gray-700") }}
-                <div class="mt-1">
-                    {{ form.description(class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md", rows="4") }}
-                    {% if form.description.errors %}
-                        {% for error in form.description.errors %}
-                            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.csrf_token }}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.code.label.text }}</label>
+                        {{ form.code(class="form-control") }}
+                        {% for error in form.code.errors %}
+                            <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
-                    {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.name.label.text }}</label>
+                        {{ form.name(class="form-control") }}
+                        {% for error in form.name.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.department.label.text }}</label>
+                        {{ form.department(class="form-control") }}
+                        {% for error in form.department.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.level.label.text }}</label>
+                        {{ form.level(class="form-control") }}
+                        {% for error in form.level.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.credits.label.text }}</label>
+                        {{ form.credits(class="form-control") }}
+                        {% for error in form.credits.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.prerequisites.label.text }}</label>
+                        {{ form.prerequisites(class="form-control") }}
+                        {% for error in form.prerequisites.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                        <div class="form-text">Enter course codes separated by commas</div>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Status -->
-            <div class="mt-6">
-                <div class="flex items-center">
-                    {{ form.is_active(class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded") }}
-                    {{ form.is_active.label(class="ml-2 block text-sm text-gray-900") }}
-                </div>
-                {% if form.is_active.errors %}
-                    {% for error in form.is_active.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                <div class="mt-3">
+                    <label class="form-label">{{ form.description.label.text }}</label>
+                    {{ form.description(class="form-control", rows="4") }}
+                    {% for error in form.description.errors %}
+                        <div class="text-danger small">{{ error }}</div>
                     {% endfor %}
-                {% endif %}
-            </div>
-
-            <!-- Submit Button -->
-            <div class="flex justify-end mt-8">
-                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    {% if course %}
-                        <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        Update Course
-                    {% else %}
-                        <svg width="32" height="32" fill="currentColor" class="bi bi-journal-bookmark text-success" viewBox="0 0 16 16">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        Add Course
-                    {% endif %}
-                </button>
-            </div>
-        </form>
+                </div>
+                <div class="mt-3">
+                    <div class="form-check">
+                        {{ form.is_active(class="form-check-input") }}
+                        <label class="form-check-label">{{ form.is_active.label.text }}</label>
+                    </div>
+                    {% for error in form.is_active.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        {% if course %}
+                            <i class="bi bi-save me-2"></i> Update Course
+                        {% else %}
+                            <i class="bi bi-plus-circle me-2"></i> Add Course
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %} 

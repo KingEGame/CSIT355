@@ -286,11 +286,8 @@ class Schedule(db.Model):
         db.Index('idx_schedule_semester', 'semester', 'academic_year'),
         db.CheckConstraint('start_time < end_time', name='chk_schedule_time'),
         db.CheckConstraint("meeting_days REGEXP '^[MTWRF]+$'", name='chk_schedule_days'),
-        db.CheckConstraint('academic_year >= YEAR(CURRENT_DATE)', name='chk_academic_year'),
+        # db.CheckConstraint('academic_year >= YEAR(CURRENT_DATE)', name='chk_academic_year'),  # Removed for MySQL compatibility
     )
-
-    def validate_enrollment_capacity(self):
-        return True
 
 class Enrolled(db.Model):
     __tablename__ = 'enrolled'

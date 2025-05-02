@@ -21,7 +21,7 @@ def dashboard():
 
     # Calculate total students
     total_students = sum(
-        teaching.schedule.current_enrollment
+        sum(1 for e in teaching.schedule.enrollments if e.status.name == 'enrolled')
         for teaching in teaching_assignments
     )
 
@@ -39,7 +39,7 @@ def dashboard():
         {
             "course_code": teaching.schedule.course.course_code,
             "course_name": teaching.schedule.course.course_name,
-            "current_enrollment": teaching.schedule.current_enrollment,
+            "current_enrollment": sum(1 for e in teaching.schedule.enrollments if e.status.name == 'enrolled'),
             "max_capacity": teaching.schedule.course.max_capacity,
             "schedule_id": teaching.schedule.schedule_id,
         }

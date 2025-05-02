@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from ..models import db, Course, Professor, Schedule, Teaching, CourseLevel, Semester
+from ..models import db, Course, Professor, Schedule, Teaching, CourseLevel, Semester, StudentStatus
 from datetime import datetime
 from web.models import Student
 from web.forms import StudentForm, ProfessorForm, CourseForm
@@ -130,8 +130,46 @@ def remove_teaching():
 
 @admin.route('/admin/students')
 def student_list():
-    students = Student.query.all()
-    return render_template('admin/student_list.html', students=students)
+    search = request.args.get('search', '').strip()
+    status = request.args.get('status', '').strip()
+    major = request.args.get('major', '').strip()
+
+    query = Student.query
+    if search:
+        query = query.filter(
+            (Student.first_name.ilike(f'%{search}%')) |
+            (Student.last_name.ilike(f'%{search}%')) |
+            (Student.email.ilike(f'%{search}%')) |
+            (Student.student_id.ilike(f'%{search}%'))
+        )
+    if status:
+        query = query.filter(Student.status == status)
+    if major:
+        query = query.filter(Student.major == major)
+
+    # Pagination (optional, adjust as needed)
+    page = request.args.get('page', 1, type=int)
+    pagination = query.order_by(Student.student_id).paginate(page=page, per_page=20, error_out=False)
+    students = pagination.items
+
+    # Calculate completed_credits for each student
+    for student in students:
+        completed_credits = 0
+        for e in getattr(student, 'enrollments', []):
+            if hasattr(e, 'status') and hasattr(e, 'schedule') and hasattr(e.schedule, 'course'):
+                if (getattr(e, 'status', None) and getattr(e, 'status', None).name == 'completed') or getattr(e, 'grade', None) is not None:
+                    completed_credits += getattr(e.schedule.course, 'credits', 0)
+        student.completed_credits = completed_credits
+
+    # Get all unique statuses and majors for the filter dropdowns
+    student_statuses = StudentStatus
+    majors = [row[0] for row in db.session.query(Student.major).distinct().all()]
+
+    return render_template('admin/student_list.html',
+                           students=students,
+                           student_statuses=student_statuses,
+                           majors=majors,
+                           pagination=pagination)
 
 @admin.route('/admin/students/add', methods=['GET', 'POST'])
 def add_student():
@@ -156,8 +194,33 @@ def add_student():
 
 @admin.route('/admin/professors')
 def professor_list():
-    professors = Professor.query.all()
-    return render_template('admin/professor_list.html', professors=professors)
+    search = request.args.get('search', '').strip()
+    department = request.args.get('department', '').strip()
+
+    query = Professor.query
+    if search:
+        query = query.filter(
+            (Professor.first_name.ilike(f'%{search}%')) |
+            (Professor.last_name.ilike(f'%{search}%')) |
+            (Professor.email.ilike(f'%{search}%')) |
+            (Professor.department.ilike(f'%{search}%'))
+        )
+    if department:
+        query = query.filter(Professor.department == department)
+
+    # Pagination (optional, adjust as needed)
+    page = request.args.get('page', 1, type=int)
+    pagination = query.order_by(Professor.professor_id).paginate(page=page, per_page=20, error_out=False)
+    professors = pagination.items
+
+    # Get all unique departments for the filter dropdown
+    departments = db.session.query(Professor.department).distinct().all()
+    departments = [{'name': row[0], 'value': row[0]} for row in departments if row[0]]
+
+    return render_template('admin/professor_list.html',
+                           professors=professors,
+                           departments=departments,
+                           pagination=pagination)
 
 @admin.route('/admin/professors/add', methods=['GET', 'POST'])
 def add_professor():
@@ -198,7 +261,30 @@ def delete_course(course_id):
 
 @admin.route('/admin/teaching-assignments')
 def teaching_assignments():
-    teaching_data = {}  # TODO: Replace with real data
+    department_filter = request.args.get('department', '').strip()
+    status_filter = request.args.get('status', '').strip()
+    teaching_data = {}
+    professors = Professor.query.all()
+    for prof in professors:
+        # Get all teaching assignments for this professor
+        teaching_assignments = prof.teaching_assignments if hasattr(prof, 'teaching_assignments') else []
+        courses = []
+        for t in teaching_assignments:
+            if hasattr(t, 'schedule') and hasattr(t.schedule, 'course'):
+                courses.append({'code': t.schedule.course.course_code})
+        current_courses = len(courses)
+        status_value = prof.status.value if hasattr(prof.status, 'value') else str(prof.status)
+        # Apply filters
+        if (not department_filter or prof.department == department_filter) and (not status_filter or status_value == status_filter):
+            teaching_data[prof.professor_id] = {
+                'name': f"{prof.first_name} {prof.last_name}",
+                'email': prof.email,
+                'office_number': getattr(prof, 'office_number', None),
+                'department': prof.department,
+                'current_courses': current_courses,
+                'courses': courses,
+                'status': status_value,
+            }
     return render_template('admin/teaching_load.html', teaching_data=teaching_data)
 
 @admin.route('/admin/students/<student_id>/delete', methods=['POST'])
@@ -219,4 +305,11 @@ def edit_student(student_id):
         db.session.commit()
         flash('Student updated successfully!', 'success')
         return redirect(url_for('admin.student_list'))
-    return render_template('admin/student_form.html', form=form, student=student) 
+    return render_template('admin/student_form.html', form=form, student=student)
+
+@admin.route('/admin/schedules')
+def schedule_list():
+    schedules = Schedule.query.all()
+    courses = {c.course_id: c for c in Course.query.all()}
+    professors = {p.professor_id: p for p in Professor.query.all()}
+    return render_template('admin/schedule_list.html', schedules=schedules, courses=courses, professors=professors) 

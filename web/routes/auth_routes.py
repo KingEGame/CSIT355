@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user
-from ..forms import LoginForm
+from ..forms import LoginForm, RegisterStudentForm
 import re
 
 auth = Blueprint('auth', __name__)
@@ -116,7 +116,7 @@ def register_student():
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
 
-    return render_template('auth/register_student.html')
+    return render_template('auth/register_student.html', form=form)
 
 def generate_next_professor_id():
     last_prof = Professor.query.order_by(Professor.professor_id.desc()).first()

@@ -67,7 +67,7 @@
                     <tr>
                         <td>{{ course.course_code }}</td>
                         <td>{{ course.course_name }}</td>
-                        <td>{{ course.current_enrollment }}/{{ course.max_capacity }}</td>
+                        <td>{{ course.current_enrollment }}/{{ course.max_enrollment }}</td>
                         <td>
                             <a href="{{ url_for('professors.view_course', schedule_id=course.schedule_id) }}"
                                 class="btn btn-primary btn-sm">View Details</a>
