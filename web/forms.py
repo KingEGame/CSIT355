@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, EmailField, TextAreaField, IntegerField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, SelectField, EmailField, TextAreaField, IntegerField, BooleanField, SubmitField, DateField
 from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError, EqualTo, Regexp, NumberRange
 from web.models import Student, StudentStatus, Course, Professor, CourseLevel
 import re
@@ -165,3 +165,21 @@ class LoginForm(FlaskForm):
     user_id = StringField('User ID', validators=[DataRequired(), Length(min=1, max=50)])
     user_type = SelectField('User Type', choices=[('student', 'Student'), ('professor', 'Professor'), ('admin', 'Admin')], validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class RegisterStudentForm(FlaskForm):
+    first_name = StringField('First Name', validators=[
+        DataRequired(),
+        Length(min=2, max=50, message='First name must be between 2 and 50 characters')
+    ])
+    last_name = StringField('Last Name', validators=[
+        DataRequired(),
+        Length(min=2, max=50, message='Last name must be between 2 and 50 characters')
+    ])
+    date_of_birth = DateField('Date of Birth', validators=[DataRequired()], format='%Y-%m-%d')
+    major = StringField('Major', validators=[DataRequired(), Length(max=50)])
+    email = EmailField('Email', validators=[
+        DataRequired(),
+        Email(message='Please enter a valid email address'),
+        Length(max=100, message='Email must be less than 100 characters')
+    ])
+    submit = SubmitField('Register')

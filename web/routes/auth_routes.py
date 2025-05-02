@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user
-from ..forms import LoginForm
+from ..forms import LoginForm, RegisterStudentForm  # Import the form class
 
 auth = Blueprint('auth', __name__)
 
@@ -83,26 +83,41 @@ def logout():
 # Registration routes can be added here if needed
 @auth.route('/register/student', methods=['GET', 'POST'])
 def register_student():
-    if request.method == 'POST':
+    form = RegisterStudentForm()  # Create the form object
+    if request.method == 'POST' and form.validate_on_submit():
         try:
+            # Query the highest existing student_id
+            last_student = db.session.query(Student).order_by(Student.student_id.desc()).first()
+
+            # Generate the next student_id
+            if last_student:
+                next_id = int(last_student.student_id[2:]) + 1  # Assuming student_id format is 'ST001'
+                new_student_id = f"ST{str(next_id).zfill(3)}"
+            else:
+                new_student_id = "ST001"  # Default for the first student
+
+            # Create the new student
             student = Student(
-                student_id=request.form['student_id'],
-                first_name=request.form['first_name'],
-                last_name=request.form['last_name'],
-                date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
-                major=request.form['major'],
-                email=request.form['email'],
+                student_id=new_student_id,
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                date_of_birth=form.date_of_birth.data,
+                major=form.major.data,
+                email=form.email.data,
                 enrollment_date=datetime.utcnow()
             )
             db.session.add(student)
             db.session.commit()
-            flash('Registration successful! Please login.', 'success')
+
+            # Flash a success message with the new student ID
+            flash(f'Registration successful! Your ID is {new_student_id}. Please login.', 'success')
+
             return redirect(url_for('auth.login'))
         except Exception as e:
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
     
-    return render_template('auth/register_student.html')
+    return render_template('auth/register_student.html', form=form)
 
 @auth.route('/register/professor', methods=['GET', 'POST'])
 def register_professor():
