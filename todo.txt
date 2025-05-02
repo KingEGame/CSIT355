@@ -1,14 +1,6 @@
 Student 
 -implement student_email_format_check
 
-Admin
--admin role need manage course fix
--admin role need teaching assingments
--bugs on admin manage students page
-
-Professor implement teacher teaching load
-
-populate academic history page
 
 LAST THING 
     Download backup of whole database when everytyhing else done
