@@ -22,7 +22,7 @@ CREATE TABLE student (
     level ENUM('undergraduate', 'graduate', 'phd') DEFAULT 'undergraduate',
     enrollment_date DATE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    total_credits INT DEFAULT 0 NOT NULL,
+    #total_credits INT DEFAULT 0 NOT NULL,
     INDEX idx_student_email (email),
     INDEX idx_student_status (status),
     CONSTRAINT student_email_format_check CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')

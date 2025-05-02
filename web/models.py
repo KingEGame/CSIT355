@@ -122,6 +122,14 @@ class Student(db.Model):
             if enrollment.status == EnrollmentStatus.completed
         )
 
+    def get_current_enrolled_credits(self):
+        """Get total credits for currently enrolled courses"""
+        return sum(
+            enrollment.schedule.course.credits
+            for enrollment in self.enrollments
+            if enrollment.status == EnrollmentStatus.enrolled
+        )
+
     @property
     def is_active(self):
         """Return True if the student is active."""
@@ -334,3 +342,12 @@ def validate_prerequisite_no_self_insert(mapper, connection, target):
 def validate_prerequisite_no_self_update(mapper, connection, target):
     if target.course_id == target.prerequisite_course_id:
         raise ValueError('A course cannot be a prerequisite of itself')
+
+@db.event.listens_for(Enrolled, 'after_update')
+def update_total_credits_after_completion(mapper, connection, target):
+    student = db.session.get(Student, target.student_id)
+    if target.status == EnrollmentStatus.completed:
+        student.total_credits = student.get_completed_credits() + student.get_current_enrolled_credits()
+    elif target.status == EnrollmentStatus.enrolled:
+        student.total_credits = student.get_completed_credits() + student.get_current_enrolled_credits()
+    db.session.commit()
