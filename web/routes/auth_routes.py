@@ -78,7 +78,7 @@ def login():
 def logout():
     logout_user()
     session.clear()
-    return redirect(url_for('index.html'))
+    return redirect(url_for('auth.index'))
 
 # Registration routes can be added here if needed
 @auth.route('/register/student', methods=['GET', 'POST'])

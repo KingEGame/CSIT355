@@ -15,7 +15,6 @@ Courses
 -duplicate enrollment verification
 -schedule conflict resolution
 -TokenValidation for course enroll - ILIAN
--Login upper tab when student logged in needs to be fixed - ILIAN
 -populate academic history page
     previous semester classes display
 
