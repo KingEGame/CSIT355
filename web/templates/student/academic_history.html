@@ -24,6 +24,15 @@
             </div>
         </div>
 
+        <!-- Credits Summary and Download -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <span class="fw-bold">Attempted Credits:</span> {{ attempted_credits }}
+                <span class="fw-bold ms-3">Completed Credits:</span> {{ completed_credits }}
+            </div>
+            <a href="{{ url_for('students.download_academic_history_csv') }}" class="btn btn-outline-primary btn-sm">Download CSV</a>
+        </div>
+
         <!-- Course History -->
         <div class="bg-white shadow-sm rounded overflow-hidden">
             <div class="px-3 py-3 border-bottom">
@@ -39,6 +48,8 @@
                             <th>Course</th>
                             <th>Professor</th>
                             <th>Credits</th>
+                            <th>Level</th>
+                            <th>Status</th>
                             <th>Grade</th>
                         </tr>
                     </thead>
@@ -58,6 +69,8 @@
                                 {% endif %}
                             </td>
                             <td class="small text-muted">{{ enrollment.schedule.course.credits }}</td>
+                            <td class="small text-muted">{{ enrollment.schedule.course.level.value|capitalize }}</td>
+                            <td class="small text-muted">{{ enrollment.status.value|capitalize }}</td>
                             <td>
                                 <span class="badge rounded-pill 
                                     {% if enrollment.grade in ['A', 'A-'] %}bg-success text-light
