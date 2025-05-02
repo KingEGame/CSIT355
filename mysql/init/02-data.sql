@@ -1,30 +1,30 @@
 -- Test data for student table
-INSERT INTO student (student_id, first_name, last_name, date_of_birth, major, status, level, enrollment_date, email) VALUES
-('ST001', 'John', 'Smith', '2000-05-15', 'Computer Science', 'active', 'undergraduate', '2020-09-01', 'john.smith@university.edu'),
-('ST002', 'Emma', 'Johnson', '1998-03-22', 'Mathematics', 'active', 'graduate', '2021-01-15', 'emma.j@university.edu'),
-('ST003', 'Michael', 'Brown', '1995-11-30', 'Physics', 'active', 'phd', '2019-09-01', 'michael.b@university.edu'),
-('ST004', 'Sarah', 'Davis', '2000-07-18', 'Chemistry', 'graduated', 'undergraduate', '2019-09-01', 'sarah.d@university.edu'),
-('ST005', 'David', 'Wilson', '1997-09-25', 'Computer Science', 'active', 'graduate', '2021-09-01', 'david.w@university.edu'),
-('ST006', 'Alice', 'Walker', '2001-02-10', 'Biology', 'active', 'undergraduate', '2022-09-01', 'alice.walker@university.edu'),
-('ST007', 'Bob', 'Lee', '1999-12-05', 'Mathematics', 'active', 'graduate', '2020-09-01', 'bob.lee@university.edu'),
-('ST008', 'Carol', 'Nguyen', '1997-06-15', 'Physics', 'active', 'phd', '2018-09-01', 'carol.nguyen@university.edu'),
-('ST009', 'Dan', 'Kim', '2002-03-20', 'Computer Science', 'active', 'undergraduate', '2023-01-10', 'dan.kim@university.edu'),
-('ST010', 'Eve', 'Patel', '2000-10-30', 'Chemistry', 'on_leave', 'undergraduate', '2019-09-01', 'eve.patel@university.edu'),
-('ST011', 'Frank', 'Moore', '2001-04-12', 'Mathematics', 'active', 'undergraduate', '2022-09-01', 'frank.moore@university.edu'),
-('ST012', 'Gina', 'Lopez', '2000-08-23', 'Physics', 'active', 'undergraduate', '2021-09-01', 'gina.lopez@university.edu'),
-('ST013', 'Henry', 'Zhang', '1999-11-30', 'Chemistry', 'active', 'graduate', '2020-09-01', 'henry.zhang@university.edu'),
-('ST014', 'Ivy', 'Singh', '1998-07-19', 'Biology', 'active', 'graduate', '2019-09-01', 'ivy.singh@university.edu'),
-('ST015', 'Jack', 'White', '1997-05-05', 'Computer Science', 'active', 'phd', '2018-09-01', 'jack.white@university.edu'),
-('ST016', 'Karen', 'Black', '2002-01-15', 'Mathematics', 'active', 'undergraduate', '2023-01-10', 'karen.black@university.edu'),
-('ST017', 'Leo', 'Green', '2001-09-09', 'Physics', 'on_leave', 'undergraduate', '2022-09-01', 'leo.green@university.edu'),
-('ST018', 'Mona', 'Brown', '2000-03-22', 'Chemistry', 'active', 'undergraduate', '2021-09-01', 'mona.brown@university.edu'),
-('ST019', 'Nina', 'Patel', '1999-12-12', 'Biology', 'graduated', 'undergraduate', '2018-09-01', 'nina.patel@university.edu'),
-('ST020', 'Oscar', 'King', '1998-10-10', 'Computer Science', 'active', 'graduate', '2020-09-01', 'oscar.king@university.edu'),
-('ST021', 'Paula', 'Scott', '2001-06-18', 'Mathematics', 'active', 'undergraduate', '2022-09-01', 'paula.scott@university.edu'),
-('ST022', 'Quinn', 'Young', '2000-02-28', 'Physics', 'active', 'undergraduate', '2021-09-01', 'quinn.young@university.edu'),
-('ST023', 'Rita', 'Hill', '1999-09-15', 'Chemistry', 'active', 'graduate', '2020-09-01', 'rita.hill@university.edu'),
-('ST024', 'Sam', 'Wright', '1998-11-11', 'Biology', 'active', 'graduate', '2019-09-01', 'sam.wright@university.edu'),
-('ST025', 'Tina', 'Evans', '1997-07-07', 'Computer Science', 'active', 'phd', '2018-09-01', 'tina.evans@university.edu');
+INSERT INTO student (student_id, first_name, last_name, date_of_birth, major, status, level, email) VALUES
+('ST001', 'John', 'Smith', '2000-05-15', 'Computer Science', 'active', 'undergraduate', 'john.smith@university.edu'),
+('ST002', 'Emma', 'Johnson', '1998-03-22', 'Mathematics', 'active', 'graduate', 'emma.j@university.edu'),
+('ST003', 'Michael', 'Brown', '1995-11-30', 'Physics', 'active', 'phd', 'michael.b@university.edu'),
+('ST004', 'Sarah', 'Davis', '2000-07-18', 'Chemistry', 'graduated', 'undergraduate', 'sarah.d@university.edu'),
+('ST005', 'David', 'Wilson', '1997-09-25', 'Computer Science', 'active', 'graduate', 'david.w@university.edu'),
+('ST006', 'Alice', 'Walker', '2001-02-10', 'Biology', 'active', 'undergraduate', 'alice.walker@university.edu'),
+('ST007', 'Bob', 'Lee', '1999-12-05', 'Mathematics', 'active', 'graduate', 'bob.lee@university.edu'),
+('ST008', 'Carol', 'Nguyen', '1997-06-15', 'Physics', 'active', 'phd', 'carol.nguyen@university.edu'),
+('ST009', 'Dan', 'Kim', '2002-03-20', 'Computer Science', 'active', 'undergraduate', 'dan.kim@university.edu'),
+('ST010', 'Eve', 'Patel', '2000-10-30', 'Chemistry', 'on_leave', 'undergraduate', 'eve.patel@university.edu'),
+('ST011', 'Frank', 'Moore', '2001-04-12', 'Mathematics', 'active', 'undergraduate', 'frank.moore@university.edu'),
+('ST012', 'Gina', 'Lopez', '2000-08-23', 'Physics', 'active', 'undergraduate', 'gina.lopez@university.edu'),
+('ST013', 'Henry', 'Zhang', '1999-11-30', 'Chemistry', 'active', 'graduate', 'henry.zhang@university.edu'),
+('ST014', 'Ivy', 'Singh', '1998-07-19', 'Biology', 'active', 'graduate', 'ivy.singh@university.edu'),
+('ST015', 'Jack', 'White', '1997-05-05', 'Computer Science', 'active', 'phd', 'jack.white@university.edu'),
+('ST016', 'Karen', 'Black', '2002-01-15', 'Mathematics', 'active', 'undergraduate', 'karen.black@university.edu'),
+('ST017', 'Leo', 'Green', '2001-09-09', 'Physics', 'on_leave', 'undergraduate', 'leo.green@university.edu'),
+('ST018', 'Mona', 'Brown', '2000-03-22', 'Chemistry', 'active', 'undergraduate', 'mona.brown@university.edu'),
+('ST019', 'Nina', 'Patel', '1999-12-12', 'Biology', 'graduated', 'undergraduate', 'nina.patel@university.edu'),
+('ST020', 'Oscar', 'King', '1998-10-10', 'Computer Science', 'active', 'graduate', 'oscar.king@university.edu'),
+('ST021', 'Paula', 'Scott', '2001-06-18', 'Mathematics', 'active', 'undergraduate', 'paula.scott@university.edu'),
+('ST022', 'Quinn', 'Young', '2000-02-28', 'Physics', 'active', 'undergraduate', 'quinn.young@university.edu'),
+('ST023', 'Rita', 'Hill', '1999-09-15', 'Chemistry', 'active', 'graduate', 'rita.hill@university.edu'),
+('ST024', 'Sam', 'Wright', '1998-11-11', 'Biology', 'active', 'graduate', 'sam.wright@university.edu'),
+('ST025', 'Tina', 'Evans', '1997-07-07', 'Computer Science', 'active', 'phd', 'tina.evans@university.edu');
 
 -- Test data for professor table
 INSERT INTO professor (professor_id, first_name, last_name, department, hire_date, email, office_number, phone) VALUES
@@ -104,6 +104,7 @@ INSERT INTO courses (course_id, course_code, course_name, description, credits, 
 ('CRS044', 'PHY803', 'Quantum Field Theory', 'PhD-level quantum field theory', 4, 'Physics', 'phd', 8),
 ('CRS045', 'CHEM402', 'Environmental Chemistry', 'PhD-level environmental chemistry', 4, 'Chemistry', 'phd', 8),
 ('CRS046', 'BIO403', 'Neurobiology', 'PhD-level neurobiology', 3, 'Biology', 'phd', 8);
+
 -- Test data for prerequisite table
 INSERT INTO prerequisite (course_id, prerequisite_course_id) VALUES
 ('CRS002', 'CRS001'),
@@ -124,32 +125,32 @@ INSERT INTO prerequisite (course_id, prerequisite_course_id) VALUES
 ('CRS025', 'CRS020');
 
 -- Test data for schedule table
-INSERT INTO schedule (schedule_id, course_id, semester, start_time, end_time, meeting_days, room_number, academic_year, max_enrollment) VALUES
-('SCH101', 'CRS001', 'Fall', '09:00:00', '10:15:00', 'MWF', 'CS-101', 2025, 30),
-('SCH102', 'CRS002', 'Fall', '09:30:00', '10:45:00', 'MWF', 'CS-102', 2025, 25),
-('SCH103', 'CRS003', 'Fall', '13:00:00', '14:15:00', 'MWF', 'MA-201', 2025, 35),
-('SCH104', 'CRS004', 'Fall', '14:30:00', '15:45:00', 'TR', 'PH-101', 2025, 30),
-('SCH105', 'CRS005', 'Fall', '10:30:00', '11:45:00', 'MWF', 'CH-101', 2025, 30),
-('SCH106', 'CRS006', 'Spring', '08:00:00', '09:15:00', 'TR', 'BIO-101', 2025, 40),
-('SCH107', 'CRS007', 'Spring', '11:00:00', '12:15:00', 'MWF', 'CS-103', 2025, 30),
-('SCH108', 'CRS008', 'Summer', '10:00:00', '11:15:00', 'TR', 'MA-202', 2025, 35),
-('SCH109', 'CRS009', 'Fall', '15:00:00', '16:15:00', 'MWF', 'CS-201', 2025, 20),
-('SCH110', 'CRS010', 'Spring', '13:00:00', '14:15:00', 'MWF', 'PH-201', 2025, 15),
-('SCH111', 'CRS011', 'Fall', '09:00:00', '10:15:00', 'MWF', 'BIO-201', 2025, 40),
-('SCH112', 'CRS012', 'Spring', '10:30:00', '11:45:00', 'TR', 'CS-301', 2025, 30),
-('SCH113', 'CRS013', 'Summer', '13:00:00', '14:15:00', 'MWF', 'MA-401', 2025, 35),
-('SCH114', 'CRS014', 'Fall', '15:00:00', '16:15:00', 'MWF', 'CS-601', 2025, 10),
-('SCH115', 'CRS015', 'Spring', '08:00:00', '09:15:00', 'TR', 'PH-601', 2025, 10),
-('SCH116', 'CRS016', 'Fall', '11:00:00', '12:15:00', 'MWF', 'CH-201', 2025, 30),
-('SCH117', 'CRS017', 'Spring', '14:30:00', '15:45:00', 'TR', 'BIO-301', 2025, 20),
-('SCH118', 'CRS018', 'Summer', '10:00:00', '11:15:00', 'TR', 'CS-701', 2025, 8),
-('SCH119', 'CRS019', 'Fall', '13:00:00', '14:15:00', 'MWF', 'MA-501', 2025, 20),
-('SCH120', 'CRS020', 'Spring', '15:00:00', '16:15:00', 'MWF', 'PH-701', 2025, 8),
-('SCH121', 'CRS021', 'Fall', '09:00:00', '10:15:00', 'MWF', 'CH-301', 2025, 20),
-('SCH122', 'CRS022', 'Spring', '10:30:00', '11:45:00', 'TR', 'BIO-401', 2025, 20),
-('SCH123', 'CRS023', 'Summer', '13:00:00', '14:15:00', 'MWF', 'CS-801', 2025, 8),
-('SCH124', 'CRS024', 'Fall', '15:00:00', '16:15:00', 'MWF', 'MA-601', 2025, 8),
-('SCH125', 'CRS025', 'Spring', '08:00:00', '09:15:00', 'TR', 'PH-801', 2025, 8);
+INSERT INTO schedule (schedule_id, course_id, semester, academic_year, start_time, end_time, meeting_days, room_number) VALUES
+('SCH101', 'CRS001', 'Fall', 2025, '09:00:00', '10:15:00', 'MWF', 'CS-101'),
+('SCH102', 'CRS002', 'Fall', 2025, '09:30:00', '10:45:00', 'MWF', 'CS-102'),
+('SCH103', 'CRS003', 'Fall', 2025, '13:00:00', '14:15:00', 'MWF', 'MA-201'),
+('SCH104', 'CRS004', 'Fall', 2025, '14:30:00', '15:45:00', 'TR', 'PH-101'),
+('SCH105', 'CRS005', 'Fall', 2025, '10:30:00', '11:45:00', 'MWF', 'CH-101'),
+('SCH106', 'CRS006', 'Spring', 2025, '08:00:00', '09:15:00', 'TR', 'BIO-101'),
+('SCH107', 'CRS007', 'Spring', 2025, '11:00:00', '12:15:00', 'MWF', 'CS-103'),
+('SCH108', 'CRS008', 'Summer', 2025, '10:00:00', '11:15:00', 'TR', 'MA-202'),
+('SCH109', 'CRS009', 'Fall', 2025, '15:00:00', '16:15:00', 'MWF', 'CS-201'),
+('SCH110', 'CRS010', 'Spring', 2025, '13:00:00', '14:15:00', 'MWF', 'PH-201'),
+('SCH111', 'CRS011', 'Fall', 2025, '09:00:00', '10:15:00', 'MWF', 'BIO-201'),
+('SCH112', 'CRS012', 'Spring', 2025, '10:30:00', '11:45:00', 'TR', 'CS-301'),
+('SCH113', 'CRS013', 'Summer', 2025, '13:00:00', '14:15:00', 'MWF', 'MA-401'),
+('SCH114', 'CRS014', 'Fall', 2025, '15:00:00', '16:15:00', 'MWF', 'CS-601'),
+('SCH115', 'CRS015', 'Spring', 2025, '08:00:00', '09:15:00', 'TR', 'PH-601'),
+('SCH116', 'CRS016', 'Fall', 2025, '11:00:00', '12:15:00', 'MWF', 'CH-201'),
+('SCH117', 'CRS017', 'Spring', 2025, '14:30:00', '15:45:00', 'TR', 'BIO-301'),
+('SCH118', 'CRS018', 'Summer', 2025, '10:00:00', '11:15:00', 'TR', 'CS-701'),
+('SCH119', 'CRS019', 'Fall', 2025, '13:00:00', '14:15:00', 'MWF', 'MA-501'),
+('SCH120', 'CRS020', 'Spring', 2025, '15:00:00', '16:15:00', 'MWF', 'PH-701'),
+('SCH121', 'CRS021', 'Fall', 2025, '09:00:00', '10:15:00', 'MWF', 'CH-301'),
+('SCH122', 'CRS022', 'Spring', 2025, '10:30:00', '11:45:00', 'TR', 'BIO-401'),
+('SCH123', 'CRS023', 'Summer', 2025, '13:00:00', '14:15:00', 'MWF', 'CS-801'),
+('SCH124', 'CRS024', 'Fall', 2025, '15:00:00', '16:15:00', 'MWF', 'MA-601'),
+('SCH125', 'CRS025', 'Spring', 2025, '08:00:00', '09:15:00', 'TR', 'PH-801');
 
 -- Test data for enrolled table (cleaned, no duplicate (student_id, schedule_id) pairs)
 INSERT INTO enrolled (student_id, schedule_id, enrollment_date, grade, status) VALUES

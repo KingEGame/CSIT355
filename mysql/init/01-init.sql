@@ -129,7 +129,8 @@ BEGIN
     IF NEW.course_id = NEW.prerequisite_course_id THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'A course cannot be a prerequisite of itself';
     END IF;
-END//
+END;
+//
 
 CREATE TRIGGER before_prerequisite_update
 BEFORE UPDATE ON prerequisite
