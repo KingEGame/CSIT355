@@ -16,7 +16,6 @@ duplicate enrollment verification
 schedule conlfict resolution
 TokenValidation for course enroll - ILIAN
 
-Delete StudentID field on register new student 
 Login upper tab when student logged in needs to be fixed - ILIAN
 
 populate academic history page
