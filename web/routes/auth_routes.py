@@ -1,56 +1,68 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
+from flask_login import login_user, logout_user, current_user
+from ..forms import LoginForm
 
 auth = Blueprint('auth', __name__)
 
+def sanitize_user_id(user_id):
+    return user_id.isalnum()
+
 @auth.route('/')
 def index():
-    if 'student_id' in session:
-        return redirect(url_for('students.dashboard'))
-    elif 'professor_id' in session:
-        return redirect(url_for('professors.dashboard'))
-    return render_template('auth/login.html')
+    if current_user.is_authenticated:
+        if session.get('user_type') == 'student':
+            return redirect(url_for('students.dashboard'))
+        elif session.get('user_type') == 'professor':
+            return redirect(url_for('professors.dashboard'))
+        elif session.get('user_type') == 'admin':
+            return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('auth.login'))
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        user_type = request.form.get('user_type')
-        
+    form = LoginForm()
+    if form.validate_on_submit():
+        user_id = form.user_id.data
+        user_type = form.user_type.data
+
+        if not sanitize_user_id(user_id):
+            flash('Invalid user ID format', 'error')
+            return redirect(url_for('auth.login'))
+
         if user_type == 'student':
             student = Student.query.get(user_id)
             if student and student.status == StudentStatus.active:
-                session['student_id'] = student.student_id
-                session['student_name'] = f"{student.first_name} {student.last_name}"
+                login_user(student)
                 session['user_type'] = 'student'
                 return redirect(url_for('students.dashboard'))
             flash('Invalid student ID or inactive account', 'error')
-        
+
         elif user_type == 'professor':
             professor = Professor.query.get(user_id)
             if professor and professor.status == ProfessorStatus.active:
-                session['professor_id'] = professor.professor_id
-                session['professor_name'] = f"{professor.first_name} {professor.last_name}"
+                login_user(professor)
                 session['user_type'] = 'professor'
                 return redirect(url_for('professors.dashboard'))
             flash('Invalid professor ID or inactive account', 'error')
+
         elif user_type == 'admin':
             if user_id == 'admin':
                 session['user_type'] = 'admin'
-                session['admin_name'] = 'Administrator'
                 return redirect(url_for('admin.dashboard'))
             flash('Invalid admin credentials', 'error')
-        
+
         else:
             flash('Invalid user type', 'error')
-    
-    return render_template('auth/login.html')
+
+    return render_template('auth/login.html', form=form)
 
 @auth.route('/logout')
 def logout():
+    logout_user()
     session.clear()
-    return redirect(url_for('auth.index'))
+    return redirect(url_for('index.html'))
 
 # Registration routes can be added here if needed
 @auth.route('/register/student', methods=['GET', 'POST'])
@@ -98,4 +110,4 @@ def register_professor():
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
     
-    return render_template('auth/register_professor.html') 
+    return render_template('auth/register_professor.html')

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}Teaching Schedule{% endblock %}
 
@@ -8,80 +8,50 @@
         <!-- Header -->
         <div class="mb-4">
             <h1 class="h2 fw-bold text-dark">Teaching Schedule</h1>
-            <p class="mt-2 text-muted">Your weekly class schedule and office hours</p>
-        </div>
-
-        <!-- Office Hours Card -->
-        <div class="bg-white shadow-sm rounded p-4 mb-4">
-            <div class="d-flex align-items-center mb-3">
-                <svg class="icon-lg text-primary me-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h2 class="fs-5 fw-semibold text-dark mb-0">Office Hours</h2>
-            </div>
-            <div class="row g-3">
-                {% for day, hours in office_hours.items() %}
-                <div class="col-md-4">
-                    <div class="bg-light rounded p-3 mb-2">
-                        <h3 class="fw-medium text-dark mb-1">{{ day }}</h3>
-                        <p class="small text-muted mb-0">{{ hours }}</p>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            <p class="mt-2 text-muted">Here is your weekly teaching schedule.</p>
         </div>
 
         <!-- Weekly Schedule -->
-        <div class="bg-white shadow-sm rounded overflow-hidden mb-4">
+        <div class="bg-white shadow-sm rounded mb-4">
             <div class="px-3 py-3 border-bottom">
-                <h2 class="fs-5 fw-semibold text-dark mb-0">Weekly Schedule</h2>
+                <h2 class="fs-5 fw-medium text-dark">Schedule</h2>
             </div>
-            {% if schedule %}
             <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
+                            <th>Day</th>
+                            <th>Course</th>
                             <th>Time</th>
-                            <th>Monday</th>
-                            <th>Tuesday</th>
-                            <th>Wednesday</th>
-                            <th>Thursday</th>
-                            <th>Friday</th>
+                            <th>Room</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for time_slot in time_slots %}
+                        {% for day, schedules in schedule_data.items() %}
                         <tr>
-                            <td class="fw-medium text-dark">{{ time_slot }}</td>
-                            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                            <td>{{ day }}</td>
                             <td>
-                                {% if schedule[day][time_slot] %}
-                                {% set course = schedule[day][time_slot] %}
-                                <div class="bg-primary bg-opacity-10 rounded p-2 mb-2">
-                                    <div class="fw-medium text-primary">{{ course.course_code }}</div>
-                                    <div class="small text-primary">{{ course.course_name }}</div>
-                                    <div class="mt-1 small text-primary">
-                                        <span class="d-block">Room {{ course.room_number }}</span>
-                                        <span class="d-block">{{ course.current_enrollment }}/{{ course.max_enrollment }} Students</span>
-                                    </div>
+                                {% for schedule in schedules %}
+                                <div>
+                                    <strong>{{ schedule.course_code }}</strong> - {{ schedule.course_name }}
                                 </div>
-                                {% endif %}
+                                {% endfor %}
                             </td>
-                            {% endfor %}
+                            <td>
+                                {% for schedule in schedules %}
+                                <div>{{ schedule.start_time }} - {{ schedule.end_time }}</div>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for schedule in schedules %}
+                                <div>{{ schedule.room_number }}</div>
+                                {% endfor %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <div class="text-center py-5">
-                <svg class="mx-auto icon-xl text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h3 class="mt-2 small fw-medium text-dark">No classes scheduled</h3>
-                <p class="mt-1 small text-muted">You have no classes scheduled for this semester.</p>
-            </div>
-            {% endif %}
         </div>
 
         <!-- Legend -->
@@ -91,14 +61,6 @@
                 <div class="col-md-4 d-flex align-items-center mb-2">
                     <div class="rounded bg-primary bg-opacity-10 me-2" style="width: 1rem; height: 1rem;"></div>
                     <span class="small text-muted">Regular Class Session</span>
-                </div>
-                <div class="col-md-4 d-flex align-items-center mb-2">
-                    <div class="rounded bg-light me-2" style="width: 1rem; height: 1rem;"></div>
-                    <span class="small text-muted">Office Hours</span>
-                </div>
-                <div class="col-md-4 d-flex align-items-center mb-2">
-                    <div class="rounded bg-white border border-dashed border-secondary me-2" style="width: 1rem; height: 1rem;"></div>
-                    <span class="small text-muted">Available Time Slot</span>
                 </div>
             </div>
         </div>
@@ -114,4 +76,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

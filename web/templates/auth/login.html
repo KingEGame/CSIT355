@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}Login{% endblock %}
 
@@ -12,6 +12,7 @@
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('auth.login') }}">
+                        {{ form.csrf_token }}
                         <div class="mb-3">
                             <label for="user_id" class="form-label">User ID</label>
                             <input type="text" class="form-control" id="user_id" name="user_id" required>
@@ -38,4 +39,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

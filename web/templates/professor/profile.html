@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}Professor Profile{% endblock %}
 
@@ -106,42 +106,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Password Change -->
-                <div class="p-4 border-top">
-                    <div>
-                        <h3 class="fs-6 fw-medium text-dark">Change Password</h3>
-                        <p class="mt-1 small text-muted">Ensure your account is secure by using a strong password.</p>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12">
-                            {{ form.current_password.label(class="form-label small fw-medium text-muted") }}
-                            {{ form.current_password(class="form-control") }}
-                            {% if form.current_password.errors %}
-                            <div class="mt-1 small text-danger">
-                                {{ form.current_password.errors[0] }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-12">
-                            {{ form.new_password.label(class="form-label small fw-medium text-muted") }}
-                            {{ form.new_password(class="form-control") }}
-                            {% if form.new_password.errors %}
-                            <div class="mt-1 small text-danger">
-                                {{ form.new_password.errors[0] }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-12">
-                            {{ form.confirm_password.label(class="form-label small fw-medium text-muted") }}
-                            {{ form.confirm_password(class="form-control") }}
-                            {% if form.confirm_password.errors %}
-                            <div class="mt-1 small text-danger">
-                                {{ form.confirm_password.errors[0] }}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
                 <!-- Form Actions -->
                 <div class="p-3 bg-light text-end">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -165,4 +129,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

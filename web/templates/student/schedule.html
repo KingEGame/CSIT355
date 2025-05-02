@@ -15,8 +15,8 @@
                 <h2 class="fs-5 fw-medium text-dark">Schedule</h2>
             </div>
             <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th>Time</th>
                             <th>Monday</th>
@@ -29,7 +29,7 @@
                     <tbody>
                         {% for hour in range(8, 18) %}
                         <tr>
-                            <td>{{ hour }}:00 - {{ hour + 1 }}:00</td>
+                            <td class="fw-bold">{{ hour }}:00 - {{ hour + 1 }}:00</td>
                             {% for day in ['M', 'T', 'W', 'R', 'F'] %}
                             <td>
                                 {% for enrollment in enrollments %}

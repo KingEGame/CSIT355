@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, EmailField, TextAreaField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, SelectField, EmailField, TextAreaField, IntegerField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, Optional, ValidationError, EqualTo, Regexp, NumberRange
 from web.models import Student, StudentStatus, Course, Professor, CourseLevel
 import re
@@ -159,4 +159,9 @@ class CourseForm(FlaskForm):
             # Check if prerequisite course exists
             prereq_course = Course.query.filter_by(code=code).first()
             if not prereq_course:
-                raise ValidationError(f'Prerequisite course {code} does not exist') 
+                raise ValidationError(f'Prerequisite course {code} does not exist')
+
+class LoginForm(FlaskForm):
+    user_id = StringField('User ID', validators=[DataRequired(), Length(min=1, max=50)])
+    user_type = SelectField('User Type', choices=[('student', 'Student'), ('professor', 'Professor'), ('admin', 'Admin')], validators=[DataRequired()])
+    submit = SubmitField('Login')

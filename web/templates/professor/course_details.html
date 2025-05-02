@@ -1,0 +1,55 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Course Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="mb-4">
+            <h1 class="h2 fw-bold text-dark">Course Details</h1>
+            <p class="mt-2 text-muted">Details for {{ schedule.course.course_code }} - {{ schedule.course.course_name }}</p>
+        </div>
+
+        <!-- Course Information -->
+        <div class="bg-white shadow-sm rounded mb-4 p-4">
+            <h2 class="fs-5 fw-medium text-dark">Course Information</h2>
+            <p><strong>Course Code:</strong> {{ schedule.course.course_code }}</p>
+            <p><strong>Course Name:</strong> {{ schedule.course.course_name }}</p>
+            <p><strong>Credits:</strong> {{ schedule.course.credits }}</p>
+            <p><strong>Meeting Days:</strong> {{ schedule.meeting_days }}</p>
+            <p><strong>Time:</strong> {{ schedule.start_time.strftime('%H:%M') }} - {{ schedule.end_time.strftime('%H:%M') }}</p>
+            <p><strong>Room:</strong> {{ schedule.room_number }}</p>
+        </div>
+
+        <!-- Enrolled Students -->
+        <div class="bg-white shadow-sm rounded mb-4">
+            <div class="px-3 py-3 border-bottom">
+                <h2 class="fs-5 fw-medium text-dark">Enrolled Students</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                        <tr>
+                            <td>{{ enrollment.student.student_id }}</td>
+                            <td>{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</td>
+                            <td>{{ enrollment.student.email }}</td>
+                            <td>{{ enrollment.grade if enrollment.grade else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -122,6 +122,24 @@ class Student(db.Model):
             if enrollment.status == EnrollmentStatus.completed
         )
 
+    @property
+    def is_active(self):
+        """Return True if the student is active."""
+        return self.status == StudentStatus.active
+
+    # Flask-Login required properties
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        """Return the student's ID."""
+        return self.student_id
+
 class Professor(db.Model):
     __tablename__ = 'professor'
     professor_id = db.Column(db.String(10), primary_key=True)
@@ -144,6 +162,35 @@ class Professor(db.Model):
     def status(self):
         from .models import ProfessorStatus  # avoid circular import if any
         return ProfessorStatus.active
+
+    @property
+    def is_active(self):
+        """Return True if the professor is active."""
+        return self.status == ProfessorStatus.active
+
+    @property
+    def office_hours(self):
+        """Return a dictionary of office hours dynamically fetched from the database."""
+        return {
+            "Monday": self.office_hours_monday,
+            "Tuesday": self.office_hours_tuesday,
+            "Wednesday": self.office_hours_wednesday,
+            "Thursday": self.office_hours_thursday,
+            "Friday": self.office_hours_friday
+        }
+
+    # Flask-Login required properties
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        """Return the professor's ID."""
+        return self.professor_id
 
 class Course(db.Model):
     __tablename__ = 'courses'
