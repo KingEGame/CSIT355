@@ -22,9 +22,11 @@ CREATE TABLE student (
     level ENUM('undergraduate', 'graduate', 'phd') DEFAULT 'undergraduate',
     enrollment_date DATE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    total_credits INT DEFAULT 0 NOT NULL,
     INDEX idx_student_email (email),
     INDEX idx_student_status (status),
-    CONSTRAINT chk_student_email CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+    CONSTRAINT student_email_format_check CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'),
+    CONSTRAINT chk_student_dob CHECK (date_of_birth <= CURRENT_DATE - INTERVAL 16 YEAR)
 );
 
 -- Create professor table 
@@ -65,7 +67,8 @@ CREATE TABLE prerequisite (
     prerequisite_course_id VARCHAR(10) NOT NULL,
     UNIQUE KEY unique_prerequisite (course_id, prerequisite_course_id),
     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (prerequisite_course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (prerequisite_course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT no_self_prerequisite CHECK (course_id != prerequisite_course_id)
 );
 
 -- Create schedule table 
@@ -84,7 +87,8 @@ CREATE TABLE schedule (
     INDEX idx_schedule_semester (semester, academic_year),
     CONSTRAINT chk_schedule_time CHECK (start_time < end_time),
     CONSTRAINT chk_schedule_days CHECK (meeting_days REGEXP '^[MTWRF]+$'),
-    CONSTRAINT chk_current_enrollment CHECK (current_enrollment <= max_enrollment)
+    CONSTRAINT chk_current_enrollment CHECK (current_enrollment <= max_enrollment),
+    CONSTRAINT chk_academic_year CHECK (academic_year >= YEAR(CURRENT_DATE))
 );
 
 -- Create enrolled table 

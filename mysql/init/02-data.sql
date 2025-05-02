@@ -29,7 +29,7 @@ INSERT INTO prerequisite (course_id, prerequisite_course_id) VALUES
 -- Test data for schedule table
 INSERT INTO schedule (schedule_id, course_id, semester, start_time, end_time, meeting_days, room_number, academic_year, max_enrollment, current_enrollment) VALUES
 ('SCH101', 'CRS001', 'Fall', '09:00:00', '10:15:00', 'MWF', 'CS-101', 2025, 30, 0),
-('SCH102', 'CRS002', 'Fall', '11:00:00', '12:15:00', 'TR', 'CS-102', 2025, 25, 0),
+('SCH102', 'CRS002', 'Fall', '09:30:00', '10:45:00', 'MWF', 'CS-102', 2025, 25, 0), -- Conflicts with SCH101
 ('SCH103', 'CRS003', 'Fall', '13:00:00', '14:15:00', 'MWF', 'MA-201', 2025, 35, 0),
 ('SCH104', 'CRS004', 'Fall', '14:30:00', '15:45:00', 'TR', 'PH-101', 2025, 30, 0),
 ('SCH105', 'CRS005', 'Fall', '10:30:00', '11:45:00', 'MWF', 'CH-101', 2025, 30, 0);
@@ -40,7 +40,12 @@ INSERT INTO enrolled (student_id, schedule_id, enrollment_date, grade, status) V
 ('ST001', 'SCH102', '2025-08-25', NULL, 'enrolled'),
 ('ST002', 'SCH103', '2025-08-26', NULL, 'enrolled'),
 ('ST003', 'SCH104', '2025-08-26', NULL, 'enrolled'),
-('ST005', 'SCH101', '2025-08-27', NULL, 'enrolled');
+('ST004', 'SCH105', '2025-08-27', NULL, 'enrolled'),
+('ST005', 'SCH101', '2025-08-27', NULL, 'enrolled'),
+('ST005', 'SCH102', '2025-08-27', NULL, 'enrolled'),
+('ST002', 'SCH105', '2025-08-28', NULL, 'enrolled'),
+('ST003', 'SCH103', '2025-08-28', NULL, 'enrolled'),
+('ST004', 'SCH104', '2025-08-29', NULL, 'enrolled');
 
 -- Test data for teaching table
 INSERT INTO teaching (teaching_id, professor_id, schedule_id) VALUES
