@@ -51,9 +51,4 @@ web/models/__pycache__/
 migrations/__pycache__/
 migrations/versions/__pycache__/
 *.pyc
-/migrations/
-!migrations/versions/*.py
-web/__pycache__/__init__.cpython-39.pyc
-web/__pycache__/__init__.cpython-312.pyc
-web/__pycache__/app.cpython-39.pyc
-web/__pycache__/models.cpython-39.pyc
+
