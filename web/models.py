@@ -60,7 +60,6 @@ class Student(db.Model):
     enrollment_date = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     enrollments = db.relationship('Enrolled', backref='student', lazy=True)
-    total_credits = db.Column(db.Integer, default=0, nullable=False)
     __table_args__ = (
         db.CheckConstraint("email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'", name='student_email_format_check'),
         db.CheckConstraint("date_of_birth <= CURRENT_DATE - INTERVAL 16 YEAR", name='chk_student_dob'),
@@ -129,6 +128,20 @@ class Student(db.Model):
             for enrollment in self.enrollments
             if enrollment.status == EnrollmentStatus.enrolled
         )
+
+    def get_total_credits(self):
+        """Calculate total credits including completed and currently enrolled courses"""
+        completed_credits = sum(
+            enrollment.schedule.course.credits
+            for enrollment in self.enrollments
+            if enrollment.status == EnrollmentStatus.completed
+        )
+        current_enrolled_credits = sum(
+            enrollment.schedule.course.credits
+            for enrollment in self.enrollments
+            if enrollment.status == EnrollmentStatus.enrolled
+        )
+        return completed_credits + current_enrolled_credits
 
     @property
     def is_active(self):
