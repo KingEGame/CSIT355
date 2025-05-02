@@ -5,8 +5,8 @@ admin role need manage course fix
 admin role need teaching assingments
 bigs on admin mange studnets page
 
-searfch for course name 
-    search implement
+searfch for course name - ILIAN
+    search implement    - ILIAN
 
 prerequisite display
 no course prerequisite on course enrollment
@@ -15,10 +15,10 @@ duplicate enrollment verification
 Professor implement teacher teaching load
 
 schedule conlfict resolution
-TokenValidation for course enroll
+TokenValidation for course enroll - ILIAN
 
 Delete StudentID field on register new student 
-Login upper tab when student logged in needs to be fixed
+Login upper tab when student logged in needs to be fixed - ILIAN
 
 populate academic history page
     previous semester classes display

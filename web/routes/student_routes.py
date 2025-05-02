@@ -65,10 +65,17 @@ def dashboard():
         if enrollment.status == EnrollmentStatus.completed
     )
 
+    total_credits = sum(
+        current_enrollments[i].schedule.course.credits
+        for i in range(len(current_enrollments))
+        if current_enrollments[i].status == EnrollmentStatus.enrolled
+    )
+
     return render_template('student/dashboard.html', 
                            student=student, 
                            enrollments=current_enrollments, 
-                           completed_credits=completed_credits)
+                           completed_credits=completed_credits,
+                           total_credits=total_credits)
 
 @students.route('/student/academic-history')
 def academic_history():
