@@ -36,6 +36,14 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Current Total Credit Load</h5>
+                    <p class="card-text display-6">{{ total_course_load }}</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Current Courses -->
@@ -61,7 +69,8 @@
                         <td>{{ course.course_name }}</td>
                         <td>{{ course.current_enrollment }}/{{ course.max_capacity }}</td>
                         <td>
-                            <a href="{{ url_for('professors.view_course', schedule_id=course.schedule_id) }}" class="btn btn-primary btn-sm">View Details</a>
+                            <a href="{{ url_for('professors.view_course', schedule_id=course.schedule_id) }}"
+                                class="btn btn-primary btn-sm">View Details</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -76,13 +85,16 @@
     <!-- Quick Links -->
     <div class="row">
         <div class="col-md-4">
-            <a href="{{ url_for('professors.schedule') }}" class="btn btn-outline-primary w-100 mb-3">Teaching Schedule</a>
+            <a href="{{ url_for('professors.schedule') }}" class="btn btn-outline-primary w-100 mb-3">Teaching
+                Schedule</a>
         </div>
         <div class="col-md-4">
-            <a href="{{ url_for('professors.course_management') }}" class="btn btn-outline-primary w-100 mb-3">Course Management</a>
+            <a href="{{ url_for('professors.course_management') }}" class="btn btn-outline-primary w-100 mb-3">Course
+                Management</a>
         </div>
         <div class="col-md-4">
-            <a href="{{ url_for('professors.profile') }}" class="btn btn-outline-primary w-100 mb-3">Profile Settings</a>
+            <a href="{{ url_for('professors.profile') }}" class="btn btn-outline-primary w-100 mb-3">Profile
+                Settings</a>
         </div>
     </div>
 </div>

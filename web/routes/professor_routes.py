@@ -25,6 +25,10 @@ def dashboard():
         for teaching in teaching_assignments
     )
 
+    total_course_load = sum(
+        teaching.schedule.course.credits
+        for teaching in teaching_assignments
+    )
     # Determine the current semester
     current_semester = None
     if teaching_assignments:
@@ -48,6 +52,7 @@ def dashboard():
         total_courses=total_courses,
         total_students=total_students,
         current_semester=current_semester,
+        total_course_load=total_course_load,
         courses=courses
     )
 

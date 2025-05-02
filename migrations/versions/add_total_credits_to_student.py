@@ -1,0 +1,1 @@
+# Removed the migration script as the `total_credits` column is no longer needed.

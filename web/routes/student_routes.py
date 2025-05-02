@@ -88,13 +88,16 @@ def dashboard():
 
     # Initialize a dummy form for CSRF protection
     form = StudentForm()
+    courses_to_completion = total_credits/120
 
     return render_template('student/dashboard.html', 
                            student=student, 
                            enrollments=current_enrollments, 
                            completed_credits=completed_credits,
                            total_credits=total_credits,
-                           form=form)
+                           form=form,
+                           courses_to_completion=courses_to_completion
+                        )
 
 @students.route('/student/academic-history')
 def academic_history():

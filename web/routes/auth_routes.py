@@ -79,7 +79,7 @@ def login():
 def logout():
     logout_user()
     session.clear()
-    return redirect(url_for('index.html'))
+    return redirect(url_for('auth.index'))
 
 def generate_next_student_id():
     last_student = Student.query.order_by(Student.student_id.desc()).first()
@@ -92,7 +92,8 @@ def generate_next_student_id():
 
 @auth.route('/register/student', methods=['GET', 'POST'])
 def register_student():
-    if request.method == 'POST':
+    form = RegisterStudentForm()  # Create the form object
+    if request.method == 'POST' and form.validate_on_submit():
         try:
             new_student_id = generate_next_student_id()
             student = Student(
@@ -106,11 +107,15 @@ def register_student():
             )
             db.session.add(student)
             db.session.commit()
-            flash('Registration successful! Please login.', 'success')
+
+            # Flash a success message with the new student ID
+            flash(f'Registration successful! Your ID is {new_student_id}. Please login.', 'success')
+
             return redirect(url_for('auth.login'))
         except Exception as e:
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
+
     return render_template('auth/register_student.html')
 
 def generate_next_professor_id():

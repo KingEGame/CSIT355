@@ -43,6 +43,11 @@
                     style="width: {{ progress_percent }}%"></div>
             </div>
             <p class="mt-2 small text-muted">{{ completed_credits }}/{{ required_credits }} credits completed</p>
+
+                    style="width: {{ (courses_to_completion) * 100 }}%"></div>
+            </div>
+            <p class="mt-2 small text-muted">{{ (courses_to_completion * 100) | round(2) }}%</p>
+
         </div>
 
         <!-- Current Courses Section -->

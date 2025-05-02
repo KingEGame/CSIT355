@@ -129,6 +129,20 @@ class Student(db.Model):
             if enrollment.status == EnrollmentStatus.enrolled
         )
 
+    def get_total_credits(self):
+        """Calculate total credits including completed and currently enrolled courses"""
+        completed_credits = sum(
+            enrollment.schedule.course.credits
+            for enrollment in self.enrollments
+            if enrollment.status == EnrollmentStatus.completed
+        )
+        current_enrolled_credits = sum(
+            enrollment.schedule.course.credits
+            for enrollment in self.enrollments
+            if enrollment.status == EnrollmentStatus.enrolled
+        )
+        return completed_credits + current_enrolled_credits
+
     @property
     def is_active(self):
         """Return True if the student is active."""

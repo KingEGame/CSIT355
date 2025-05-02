@@ -1,20 +1,18 @@
-implement courses to completion before_student_update
-implement student_email_format_check
+Student 
+-implement student_email_format_check
 
-admin role need manage course fix
-admin role need teaching assingments
-bigs on admin mange studnets page
-
-
+Admin
+-admin role need manage course fix
+-admin role need teaching assingments
+-bugs on admin manage students page
 
 Professor implement teacher teaching load
 
 populate academic history page
-    previous semester classes display
 
 LAST THING 
     Download backup of whole database when everytyhing else done
 
-Create new ER Diagram for the current database schema
+Create new ER Diagram for the current database schema - NANDINI
     the database schema is different case 
     
