@@ -27,7 +27,8 @@
             </div>
             <div class="bg-white shadow-sm rounded p-3 d-flex flex-column align-items-center">
                 <span class="small text-muted">Current Semester</span>
-                <span class="fs-4 fw-bold text-primary">{{ enrollments[0].schedule.semester if enrollments else 'N/A' }}</span>
+                <span class="fs-4 fw-bold text-primary">{{ enrollments[0].schedule.semester if enrollments else 'N/A'
+                    }}</span>
             </div>
         </div>
 
@@ -36,7 +37,8 @@
         <div class="bg-white shadow-sm rounded mb-4 p-4">
             <h2 class="fs-5 fw-medium text-dark mb-3">Credit Progress</h2>
             <div class="progress" style="height: 0.5rem;">
-                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (completed_credits / 120) * 100 }}%"></div>
+                <div class="progress-bar bg-primary" role="progressbar"
+                    style="width: {{ (completed_credits / 120) * 100 }}%"></div>
             </div>
             <p class="mt-2 small text-muted">{{ completed_credits }}/120 credits completed</p>
         </div>
@@ -47,10 +49,11 @@
             <div class="px-3 py-3 border-bottom">
                 <div class="d-flex align-items-center justify-content-between">
                     <h2 class="fs-5 fw-medium text-dark">Current Courses</h2>
-                    <a href="{{ url_for('students.available_courses') }}" class="btn btn-primary btn-sm">Browse Courses</a>
+                    <a href="{{ url_for('students.available_courses') }}" class="btn btn-primary btn-sm">Browse
+                        Courses</a>
                 </div>
             </div>
-            
+
             {% if enrollments %}
             <div class="border-top">
                 {% for enrollment in enrollments %}
@@ -58,29 +61,39 @@
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center">
                             <div class="flex-shrink-0">
-                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem;">
-                                    <span class="text-primary fw-medium">{{ enrollment.schedule.course.course_code[:2] }}</span>
+                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                    style="width: 2.5rem; height: 2.5rem;">
+                                    <span class="text-primary fw-medium">{{ enrollment.schedule.course.course_code[:2]
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="ms-3">
                                 <h3 class="fs-6 fw-medium text-dark mb-1">
-                                    {{ enrollment.schedule.course.course_code }} - {{ enrollment.schedule.course.course_name }}
+                                    {{ enrollment.schedule.course.course_code }} - {{
+                                    enrollment.schedule.course.course_name }}
                                 </h3>
                                 <div class="d-flex align-items-center small text-muted mb-1">
-                                    <svg class="flex-shrink-0 me-2 icon-md text-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg class="flex-shrink-0 me-2 icon-md text-muted"
+                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                                     </svg>
                                     {% if enrollment.schedule.professors|length > 0 %}
-                                        Prof. {{ enrollment.schedule.professors[0].last_name }}
+                                    Prof. {{ enrollment.schedule.professors[0].last_name }}
                                     {% else %}
-                                        No professor assigned
+                                    No professor assigned
                                     {% endif %}
                                 </div>
                                 <div class="d-flex align-items-center small text-muted">
-                                    <svg class="flex-shrink-0 me-2 icon-md text-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                    <svg class="flex-shrink-0 me-2 icon-md text-muted"
+                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                            clip-rule="evenodd" />
                                     </svg>
-                                    {{ enrollment.schedule.meeting_days }} {{ enrollment.schedule.start_time.strftime('%H:%M') }} - {{ enrollment.schedule.end_time.strftime('%H:%M') }} | Room {{ enrollment.schedule.room_number }}
+                                    {{ enrollment.schedule.meeting_days }} {{
+                                    enrollment.schedule.start_time.strftime('%H:%M') }} - {{
+                                    enrollment.schedule.end_time.strftime('%H:%M') }} | Room {{
+                                    enrollment.schedule.room_number }}
                                 </div>
                             </div>
                         </div>
@@ -89,7 +102,9 @@
                         <form action="{{ url_for('students.drop_course') }}" method="POST" class="d-inline">
                             <input type="hidden" name="enrollment_id" value="{{ enrollment.enrollment_id }}">
                             <input type="hidden" name="schedule_id" value="{{ enrollment.schedule.schedule_id }}">
-                            <button type="submit" class="btn btn-link text-danger fw-medium p-0" onclick="return confirm('Are you sure you want to drop this course?')">Drop Course</button>
+                            <button type="submit" class="btn btn-link text-danger fw-medium p-0"
+                                onclick="return confirm('Are you sure you want to drop this course?')">Drop
+                                Course</button>
                         </form>
                     </div>
                 </div>
@@ -97,13 +112,16 @@
             </div>
             {% else %}
             <div class="px-3 py-5 text-center">
-                <svg class="mx-auto icon-md text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 0 012 2" />
+                <svg class="mx-auto icon-md text-muted" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 0 012 2" />
                 </svg>
                 <h3 class="mt-2 small fw-medium text-dark">No courses</h3>
                 <p class="mt-1 small text-muted">Get started by browsing available courses.</p>
                 <div class="mt-4">
-                    <a href="{{ url_for('students.available_courses') }}" class="btn btn-primary btn-sm">Browse Courses</a>
+                    <a href="{{ url_for('students.available_courses') }}" class="btn btn-primary btn-sm">Browse
+                        Courses</a>
                 </div>
             </div>
             {% endif %}
@@ -115,33 +133,45 @@
                 <h2 class="fs-6 fw-medium text-dark mb-2">Quick Links</h2>
                 <div class="row g-2">
                     <div class="col-6">
-                        <a href="{{ url_for('students.available_courses') }}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
-                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <a href="{{ url_for('students.available_courses') }}"
+                            class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
+                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                             <span class="small fw-medium">Course Registration</span>
                         </a>
                     </div>
                     <div class="col-6">
-                        <a href="{{ url_for('students.academic_history') }}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
-                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        <a href="{{ url_for('students.academic_history') }}"
+                            class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
+                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                             <span class="small fw-medium">Academic Progress</span>
                         </a>
                     </div>
                     <div class="col-6">
-                        <a href="{{ url_for('students.schedule') }}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
-                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <a href="{{ url_for('students.schedule') }}"
+                            class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
+                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span class="small fw-medium">Schedule</span>
                         </a>
                     </div>
                     <div class="col-6">
-                        <a href="{{ url_for('students.profile') }}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
-                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <a href="{{ url_for('students.profile') }}"
+                            class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
+                            <svg class="icon-md text-primary me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                             <span class="small fw-medium">Profile Settings</span>
                         </a>
