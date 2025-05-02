@@ -1,0 +1,31 @@
+implement courses to completion before_student_update
+implement student_email_format_check
+
+admin role need manage course fix
+admin role need teaching assingments
+bigs on admin mange studnets page
+
+searfch for course name 
+    search implement
+
+prerequisite display
+no course prerequisite on course enrollment
+
+duplicate enrollment verification
+Professor implement teacher teaching load
+
+schedule conlfict resolution
+TokenValidation for course enroll
+
+Delete StudentID field on register new student 
+Login upper tab when student logged in needs to be fixed
+
+populate academic history page
+    previous semester classes display
+
+LAST THING 
+    Download backup of whole database when everytyhing else done
+
+Create new ER Diagram for the current database schema
+    the database schema is different case 
+    
