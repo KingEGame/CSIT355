@@ -38,9 +38,9 @@
             <h2 class="fs-5 fw-medium text-dark mb-3">Credit Progress</h2>
             <div class="progress" style="height: 0.5rem;">
                 <div class="progress-bar bg-primary" role="progressbar"
-                    style="width: {{ (completed_credits / 120) * 100 }}%"></div>
+                    style="width: {{ (courses_to_completion) * 100 }}%"></div>
             </div>
-            <p class="mt-2 small text-muted">{{ completed_credits }}/120 credits completed</p>
+            <p class="mt-2 small text-muted">{{ (courses_to_completion * 100) | round(2) }}%</p>
         </div>
         {% endif %}
 
