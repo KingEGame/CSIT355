@@ -37,9 +37,35 @@ def dashboard():
                          stats=stats)
 
 @admin.route('/admin/courses')
-def list_courses():
-    courses = Course.query.all()
-    return render_template('admin/course_list.html', courses=courses)
+def course_list():
+    search = request.args.get('search', '').strip()
+    department = request.args.get('department', '').strip()
+    level = request.args.get('level', '').strip()
+
+    query = Course.query
+    if search:
+        query = query.filter(
+            (Course.course_code.ilike(f'%{search}%')) |
+            (Course.course_name.ilike(f'%{search}%'))
+        )
+    if department:
+        query = query.filter(Course.department == department)
+    if level:
+        query = query.filter(Course.level == level)
+
+    courses = query.all()
+
+    # For dropdowns
+    departments = db.session.query(Course.department).distinct().all()
+    departments = [{'name': row[0], 'value': row[0]} for row in departments if row[0]]
+    course_levels = [{'name': lvl.name, 'value': lvl.value.capitalize()} for lvl in CourseLevel]
+
+    return render_template(
+        'admin/course_list.html',
+        courses=courses,
+        departments=departments,
+        course_levels=course_levels
+    )
 
 @admin.route('/admin/course/new', methods=['GET', 'POST'])
 def create_course():
@@ -183,7 +209,6 @@ def add_student():
             major=form.major.data,
             status=form.status.data,
             date_of_birth=datetime.now().date(),  # Placeholder, should be in form
-            enrollment_date=datetime.now().date(),
             level=None  # Set as needed
         )
         db.session.add(student)
@@ -237,11 +262,6 @@ def edit_professor(professor_id):
 def delete_professor(professor_id):
     flash(f'Delete professor {professor_id} (not implemented)', 'warning')
     return redirect(url_for('admin.professor_list'))
-
-@admin.route('/admin/courses')
-def course_list():
-    courses = Course.query.all()
-    return render_template('admin/course_list.html', courses=courses)
 
 @admin.route('/admin/courses/add', methods=['GET', 'POST'])
 def add_course():

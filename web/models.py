@@ -57,7 +57,6 @@ class Student(db.Model):
     major = db.Column(db.String(50), nullable=False)
     status = db.Column(db.Enum(StudentStatus), default=StudentStatus.active)
     level = db.Column(db.Enum(CourseLevel), default=CourseLevel.undergraduate)
-    enrollment_date = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     enrollments = db.relationship('Enrolled', backref='student', lazy=True)
     __table_args__ = (
@@ -274,7 +273,6 @@ class Schedule(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     meeting_days = db.Column(db.String(10), nullable=False)
     room_number = db.Column(db.String(10), nullable=False)
-    max_enrollment = db.Column(db.Integer, nullable=False)
     teaching_assignments = db.relationship('Teaching', backref='schedule', lazy=True)
     enrollments = db.relationship('Enrolled', backref='schedule', lazy=True)
     professors = db.relationship(

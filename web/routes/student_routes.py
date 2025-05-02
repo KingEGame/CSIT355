@@ -211,7 +211,7 @@ def available_courses():
     available_schedules = []
     for schedule in schedules:
         enrolled_count = sum(1 for e in schedule.enrollments if e.status == EnrollmentStatus.enrolled)
-        if enrolled_count < schedule.max_enrollment:
+        if enrolled_count < schedule.course.max_capacity:
             schedule._enrolled_count = enrolled_count  # attach for template use
             available_schedules.append(schedule)
 
@@ -356,7 +356,7 @@ def register_course():
 
         # Check if the course has reached maximum enrollment
         enrolled_count = sum(1 for e in schedule.enrollments if e.status == EnrollmentStatus.enrolled)
-        if enrolled_count >= schedule.max_enrollment:
+        if enrolled_count >= schedule.course.max_capacity:
             flash('Cannot register: The course has reached its maximum enrollment.', 'error')
             return redirect(url_for('students.available_courses'))
 
@@ -364,7 +364,6 @@ def register_course():
         enrollment = Enrolled(
             student_id=session['student_id'],
             schedule_id=schedule_id,
-            enrollment_date=datetime.utcnow(),
             status=EnrollmentStatus.enrolled
         )
 

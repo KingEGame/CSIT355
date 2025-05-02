@@ -31,6 +31,12 @@ def enroll():
     
     schedule_id = request.form.get('schedule_id')
     try:
+        schedule = Schedule.query.get(schedule_id)
+        if not schedule:
+            return jsonify({'success': False, 'message': 'Schedule not found'})
+        enrolled_count = sum(1 for e in schedule.enrollments if e.status.name == 'enrolled')
+        if enrolled_count >= schedule.course.max_capacity:
+            return jsonify({'success': False, 'message': 'Course is full'})
         enrollment = Enrolled(
             student_id=session['student_id'],
             schedule_id=schedule_id

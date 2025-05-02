@@ -102,8 +102,7 @@ def register_student():
                 last_name=request.form['last_name'],
                 date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
                 major=request.form['major'],
-                email=request.form['email'],
-                enrollment_date=datetime.utcnow()
+                email=request.form['email']
             )
             db.session.add(student)
             db.session.commit()
@@ -115,7 +114,6 @@ def register_student():
         except Exception as e:
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
-
     return render_template('auth/register_student.html', form=form)
 
 def generate_next_professor_id():
