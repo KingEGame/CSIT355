@@ -274,7 +274,6 @@ class Schedule(db.Model):
     end_time = db.Column(db.Time, nullable=False)
     meeting_days = db.Column(db.String(10), nullable=False)
     room_number = db.Column(db.String(10), nullable=False)
-    current_enrollment = db.Column(db.Integer, default=0)
     max_enrollment = db.Column(db.Integer, nullable=False)
     teaching_assignments = db.relationship('Teaching', backref='schedule', lazy=True)
     enrollments = db.relationship('Enrolled', backref='schedule', lazy=True)
@@ -287,14 +286,10 @@ class Schedule(db.Model):
         db.Index('idx_schedule_semester', 'semester', 'academic_year'),
         db.CheckConstraint('start_time < end_time', name='chk_schedule_time'),
         db.CheckConstraint("meeting_days REGEXP '^[MTWRF]+$'", name='chk_schedule_days'),
-        db.CheckConstraint('current_enrollment <= max_enrollment', name='chk_current_enrollment'),
         db.CheckConstraint('academic_year >= YEAR(CURRENT_DATE)', name='chk_academic_year'),
     )
 
     def validate_enrollment_capacity(self):
-        """Validate that current enrollment doesn't exceed course max capacity"""
-        if self.current_enrollment > self.max_enrollment:
-            raise ValueError(f"Current enrollment ({self.current_enrollment}) cannot exceed schedule maximum enrollment ({self.max_enrollment})")
         return True
 
 class Enrolled(db.Model):
@@ -322,29 +317,6 @@ class Teaching(db.Model):
         db.UniqueConstraint('professor_id', 'schedule_id', name='unique_teaching_assignment'),
     )
 
-# Modify the event listener to include capacity validation
-@db.event.listens_for(Enrolled, 'before_insert')
-def validate_enrollment_before_insert(mapper, connection, target):
-    schedule = db.session.get(Schedule, target.schedule_id)
-    if schedule.current_enrollment >= schedule.max_enrollment:
-        raise ValueError(f"Cannot enroll: Course has reached maximum enrollment of {schedule.max_enrollment}")
-
-@db.event.listens_for(Enrolled, 'after_insert')
-def update_enrollment_count_after_insert(mapper, connection, target):
-    connection.execute(
-        Schedule.__table__.update().
-        where(Schedule.schedule_id == target.schedule_id).
-        values(current_enrollment=Schedule.current_enrollment + 1)
-    )
-
-@db.event.listens_for(Enrolled, 'after_delete')
-def update_enrollment_count_after_delete(mapper, connection, target):
-    connection.execute(
-        Schedule.__table__.update().
-        where(Schedule.schedule_id == target.schedule_id).
-        values(current_enrollment=Schedule.current_enrollment - 1)
-    )
-
 # Add ORM-level triggers to prevent self-prerequisites
 @db.event.listens_for(Prerequisite, 'before_insert')
 def validate_prerequisite_no_self_insert(mapper, connection, target):
@@ -363,4 +335,3 @@ def update_total_credits_after_completion(mapper, connection, target):
         student.total_credits = student.get_completed_credits() + student.get_current_enrolled_credits()
     elif target.status == EnrollmentStatus.enrolled:
         student.total_credits = student.get_completed_credits() + student.get_current_enrolled_credits()
-    db.session.commit()

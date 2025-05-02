@@ -26,6 +26,11 @@ def load_user(user_id):
     user = Student.query.get(user_id) or Professor.query.get(user_id)
     return user
 
+# Add teardown context
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
 # Register blueprints
 from web.routes.auth_routes import auth
 from web.routes.professor_routes import professors

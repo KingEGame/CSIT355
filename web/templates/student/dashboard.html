@@ -3,6 +3,9 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
+{% set required_credits = 120 if student.level.value == 'undergraduate' else 30 if student.level.value == 'graduate' else 60 %}
+{% set level_label = 'Undergraduate' if student.level.value == 'undergraduate' else 'Graduate' if student.level.value == 'graduate' else 'PhD' %}
+{% set progress_percent = (completed_credits / required_credits * 100) if required_credits else 0 %}
 <div class="container-fluid py-4">
     <div class="container">
         <!-- Welcome Section -->
@@ -33,16 +36,19 @@
         </div>
 
         <!-- Progress Bar Section -->
-        {% if student.level.value == 'undergraduate' %}
         <div class="bg-white shadow-sm rounded mb-4 p-4">
-            <h2 class="fs-5 fw-medium text-dark mb-3">Credit Progress</h2>
+            <h2 class="fs-5 fw-medium text-dark mb-3">Credit Progress ({{ level_label }})</h2>
             <div class="progress" style="height: 0.5rem;">
                 <div class="progress-bar bg-primary" role="progressbar"
+                    style="width: {{ progress_percent }}%"></div>
+            </div>
+            <p class="mt-2 small text-muted">{{ completed_credits }}/{{ required_credits }} credits completed</p>
+
                     style="width: {{ (courses_to_completion) * 100 }}%"></div>
             </div>
             <p class="mt-2 small text-muted">{{ (courses_to_completion * 100) | round(2) }}%</p>
+
         </div>
-        {% endif %}
 
         <!-- Current Courses Section -->
         <div class="bg-white shadow-sm rounded mb-4">
@@ -100,6 +106,7 @@
                     </div>
                     <div class="ms-3 flex-shrink-0">
                         <form action="{{ url_for('students.drop_course') }}" method="POST" class="d-inline">
+                            {{ form.hidden_tag() }}
                             <input type="hidden" name="enrollment_id" value="{{ enrollment.enrollment_id }}">
                             <input type="hidden" name="schedule_id" value="{{ enrollment.schedule.schedule_id }}">
                             <button type="submit" class="btn btn-link text-danger fw-medium p-0"

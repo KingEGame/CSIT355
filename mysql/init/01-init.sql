@@ -22,7 +22,6 @@ CREATE TABLE student (
     level ENUM('undergraduate', 'graduate', 'phd') DEFAULT 'undergraduate',
     enrollment_date DATE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    #total_credits INT DEFAULT 0 NOT NULL,
     INDEX idx_student_email (email),
     INDEX idx_student_status (status),
     CONSTRAINT student_email_format_check CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
@@ -69,7 +68,7 @@ CREATE TABLE prerequisite (
     FOREIGN KEY (prerequisite_course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Removed invalid Python ORM code mistakenly included in the SQL file
+-- Removed current_enrollment from schedule table and related constraints
 CREATE TABLE schedule (
     schedule_id VARCHAR(10) PRIMARY KEY,
     course_id VARCHAR(10) NOT NULL,
@@ -79,13 +78,11 @@ CREATE TABLE schedule (
     end_time TIME NOT NULL,
     meeting_days VARCHAR(10) NOT NULL,
     room_number VARCHAR(10) NOT NULL,
-    current_enrollment INT DEFAULT 0,
     max_enrollment INT NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_schedule_semester (semester, academic_year),
     CONSTRAINT chk_schedule_time CHECK (start_time < end_time),
-    CONSTRAINT chk_schedule_days CHECK (meeting_days REGEXP '^[MTWRF]+$'),
-    CONSTRAINT chk_current_enrollment CHECK (current_enrollment <= max_enrollment)
+    CONSTRAINT chk_schedule_days CHECK (meeting_days REGEXP '^[MTWRF]+$')
 );
 
 -- Create enrolled table 
@@ -114,8 +111,7 @@ CREATE TABLE teaching (
 );
 
 -- Drop existing triggers if they exist
-DROP TRIGGER IF EXISTS after_enrollment_insert;
-DROP TRIGGER IF EXISTS after_enrollment_delete;
+
 DROP TRIGGER IF EXISTS before_prerequisite_insert;
 DROP TRIGGER IF EXISTS before_prerequisite_update;
 DROP TRIGGER IF EXISTS before_schedule_insert;
@@ -126,23 +122,6 @@ DROP TRIGGER IF EXISTS before_student_update;
 -- Create triggers to maintain enrollment counts
 DELIMITER //
 
-CREATE TRIGGER after_enrollment_insert
-AFTER INSERT ON enrolled
-FOR EACH ROW
-BEGIN
-    UPDATE schedule 
-    SET current_enrollment = current_enrollment + 1
-    WHERE schedule_id = NEW.schedule_id;
-END//
-
-CREATE TRIGGER after_enrollment_delete
-AFTER DELETE ON enrolled
-FOR EACH ROW
-BEGIN
-    UPDATE schedule 
-    SET current_enrollment = current_enrollment - 1
-    WHERE schedule_id = OLD.schedule_id;
-END//
 
 -- Add trigger to prevent self-prerequisites
 CREATE TRIGGER before_prerequisite_insert
@@ -202,3 +181,4 @@ BEGIN
 END//
 
 DELIMITER ;
+

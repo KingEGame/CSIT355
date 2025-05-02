@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user
-from ..forms import LoginForm, RegisterStudentForm  # Import the form class
+from ..forms import LoginForm
+import re
 
 auth = Blueprint('auth', __name__)
 
@@ -80,30 +81,28 @@ def logout():
     session.clear()
     return redirect(url_for('auth.index'))
 
-# Registration routes can be added here if needed
+def generate_next_student_id():
+    last_student = Student.query.order_by(Student.student_id.desc()).first()
+    if last_student and re.match(r"ST\\d{3,}", last_student.student_id):
+        last_num = int(last_student.student_id[2:])
+        next_num = last_num + 1
+    else:
+        next_num = 1
+    return f"ST{next_num:03d}"
+
 @auth.route('/register/student', methods=['GET', 'POST'])
 def register_student():
     form = RegisterStudentForm()  # Create the form object
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            # Query the highest existing student_id
-            last_student = db.session.query(Student).order_by(Student.student_id.desc()).first()
-
-            # Generate the next student_id
-            if last_student:
-                next_id = int(last_student.student_id[2:]) + 1  # Assuming student_id format is 'ST001'
-                new_student_id = f"ST{str(next_id).zfill(3)}"
-            else:
-                new_student_id = "ST001"  # Default for the first student
-
-            # Create the new student
+            new_student_id = generate_next_student_id()
             student = Student(
                 student_id=new_student_id,
-                first_name=form.first_name.data,
-                last_name=form.last_name.data,
-                date_of_birth=form.date_of_birth.data,
-                major=form.major.data,
-                email=form.email.data,
+                first_name=request.form['first_name'],
+                last_name=request.form['last_name'],
+                date_of_birth=datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d'),
+                major=request.form['major'],
+                email=request.form['email'],
                 enrollment_date=datetime.utcnow()
             )
             db.session.add(student)
@@ -116,15 +115,25 @@ def register_student():
         except Exception as e:
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
-    
-    return render_template('auth/register_student.html', form=form)
+
+    return render_template('auth/register_student.html')
+
+def generate_next_professor_id():
+    last_prof = Professor.query.order_by(Professor.professor_id.desc()).first()
+    if last_prof and re.match(r"PR\\d{3,}", last_prof.professor_id):
+        last_num = int(last_prof.professor_id[2:])
+        next_num = last_num + 1
+    else:
+        next_num = 1
+    return f"PR{next_num:03d}"
 
 @auth.route('/register/professor', methods=['GET', 'POST'])
 def register_professor():
     if request.method == 'POST':
         try:
+            new_professor_id = generate_next_professor_id()
             professor = Professor(
-                professor_id=request.form['professor_id'],
+                professor_id=new_professor_id,
                 first_name=request.form['first_name'],
                 last_name=request.form['last_name'],
                 department=request.form['department'],
@@ -140,5 +149,4 @@ def register_professor():
         except Exception as e:
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
-    
     return render_template('auth/register_professor.html')

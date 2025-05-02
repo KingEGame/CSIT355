@@ -6,7 +6,7 @@ from ..forms import StudentForm
 
 students = Blueprint('students', __name__)
 
-@students.route('/student/profile')
+@students.route('/student/profile', methods=['GET', 'POST'])
 def profile():
     if 'student_id' not in session:
         return redirect(url_for('auth.login'))
@@ -16,8 +16,23 @@ def profile():
         flash('Student not found', 'error')
         return redirect(url_for('auth.login'))
 
-    # Initialize the form with student data
     form = StudentForm(obj=student)
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            student.first_name = form.first_name.data
+            student.last_name = form.last_name.data
+            student.email = form.email.data
+            student.major = form.major.data
+            try:
+                db.session.commit()
+                flash('Profile updated successfully.', 'success')
+                return redirect(url_for('students.profile'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error updating profile: {str(e)}', 'error')
+        else:
+            flash('Please correct the errors in the form.', 'error')
 
     return render_template('student/profile.html', student=student, form=form)
 
@@ -71,6 +86,8 @@ def dashboard():
         if current_enrollments[i].status == EnrollmentStatus.enrolled
     )
 
+    # Initialize a dummy form for CSRF protection
+    form = StudentForm()
     courses_to_completion = total_credits/120
 
     return render_template('student/dashboard.html', 
@@ -78,6 +95,7 @@ def dashboard():
                            enrollments=current_enrollments, 
                            completed_credits=completed_credits,
                            total_credits=total_credits,
+                           form=form,
                            courses_to_completion=courses_to_completion
                         )
 
@@ -91,54 +109,137 @@ def academic_history():
         flash('Student not found', 'error')
         return redirect(url_for('auth.login'))
     
-    # Get completed courses with grades
-    completed_courses = [e for e in student.enrollments if e.grade is not None]
+    enrollments = student.enrollments
+    completed_courses = [e for e in student.enrollments if e.status == EnrollmentStatus.completed or e.grade is not None]
+    gpa = student.get_gpa()
+    attempted_credits = sum(e.schedule.course.credits for e in enrollments if e.status != EnrollmentStatus.dropped)
+    completed_credits = sum(e.schedule.course.credits for e in enrollments if e.status == EnrollmentStatus.completed)
+    return render_template(
+        'student/academic_history.html',
+        student=student,
+        enrollments=enrollments,
+        completed_courses=completed_courses,
+        gpa=gpa,
+        attempted_credits=attempted_credits,
+        completed_credits=completed_credits
+    )
 
-    # Calculate GPA
-    grade_points = {
-        'A+': 4.0, 'A': 4.0, 'A-': 3.7,
-        'B+': 3.3, 'B': 3.0, 'B-': 2.7,
-        'C+': 2.3, 'C': 2.0, 'C-': 1.7,
-        'D+': 1.3, 'D': 1.0, 'F': 0.0
-    }
-    total_points = sum(grade_points.get(e.grade, 0) * e.schedule.course.credits for e in completed_courses)
-    total_credits = sum(e.schedule.course.credits for e in completed_courses)
-    gpa = round(total_points / total_credits, 2) if total_credits > 0 else 0.0
-
-    return render_template('student/academic_history.html',
-                           student=student,
-                           completed_courses=completed_courses,
-                           gpa=gpa)
+@students.route('/student/academic-history/download-csv')
+def download_academic_history_csv():
+    if 'student_id' not in session:
+        return redirect(url_for('auth.login'))
+    import csv
+    from io import StringIO
+    student = Student.query.get(session['student_id'])
+    enrollments = student.enrollments
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Year/Semester', 'Course Code', 'Course Name', 'Professor', 'Credits', 'Level', 'Status', 'Grade'])
+    for e in enrollments:
+        prof = e.schedule.professors[0].last_name if e.schedule.professors and len(e.schedule.professors) > 0 else ''
+        writer.writerow([
+            f"{e.schedule.academic_year} {e.schedule.semester}",
+            e.schedule.course.course_code,
+            e.schedule.course.course_name,
+            prof,
+            e.schedule.course.credits,
+            e.schedule.course.level.value.capitalize(),
+            e.status.value.capitalize(),
+            e.grade if e.grade else 'N/A'
+        ])
+    output.seek(0)
+    from flask import Response
+    return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=academic_history.csv"})
 
 @students.route('/student/available-courses')
 def available_courses():
     if 'student_id' not in session:
         return redirect(url_for('auth.login'))
-    
+
     student = Student.query.get(session['student_id'])
     if not student:
         flash('Student not found', 'error')
         return redirect(url_for('auth.login'))
-    
-    # Get courses appropriate for student's level
+
+    # Get filter and sort parameters from request
+    search = request.args.get('search', '').strip()
+    semester = request.args.get('semester', '').strip()
+    level = request.args.get('level', '').strip()
+    sort = request.args.get('sort', 'course_code')  # default sort
+    sort_dir = request.args.get('sort_dir', 'asc')
+
     allowed_levels = get_allowed_course_levels(student.level)
-    
-    # Get all available courses for the student's level
-    schedules = Schedule.query.join(Course).filter(
-        Schedule.current_enrollment < Schedule.max_enrollment,
+
+    # Build the base query
+    query = Schedule.query.join(Course).filter(
         Course.level.in_(allowed_levels)
-    ).all()
-    
+    )
+
+    # Apply search filter
+    if search:
+        query = query.filter(
+            (Course.course_code.ilike(f"%{search}%")) |
+            (Course.course_name.ilike(f"%{search}%"))
+        )
+
+    # Apply semester filter
+    if semester:
+        query = query.filter(Schedule.semester == semester)
+
+    # Apply level filter
+    if level:
+        query = query.filter(Course.level == level)
+
+    # Sorting
+    sort_options = {
+        'course_code': Course.course_code,
+        'course_name': Course.course_name,
+        'credits': Course.credits,
+        'semester': Schedule.semester,
+        'academic_year': Schedule.academic_year
+    }
+    sort_column = sort_options.get(sort, Course.course_code)
+    if sort_dir == 'desc':
+        sort_column = sort_column.desc()
+    else:
+        sort_column = sort_column.asc()
+    query = query.order_by(sort_column)
+
+    schedules = query.all()
+
+    # Dynamically filter schedules with available spots and annotate with enrolled count
+    available_schedules = []
+    for schedule in schedules:
+        enrolled_count = sum(1 for e in schedule.enrollments if e.status == EnrollmentStatus.enrolled)
+        if enrolled_count < schedule.max_enrollment:
+            schedule._enrolled_count = enrolled_count  # attach for template use
+            available_schedules.append(schedule)
+
     # Get student's current enrollments to check for duplicates
     student_enrollments = Enrolled.query.filter_by(
         student_id=session['student_id']
     ).all()
     enrolled_schedule_ids = [e.schedule_id for e in student_enrollments]
-    
+
+    # For filter dropdowns
+    semesters = list(Semester)
+    course_levels = list(CourseLevel)
+
+    # Initialize a dummy form for CSRF protection
+    form = StudentForm()
+
     return render_template('student/available_courses.html',
-                         schedules=schedules,
+                         schedules=available_schedules,
                          enrolled_schedule_ids=enrolled_schedule_ids,
-                         student_level=student.level)
+                         student_level=student.level,
+                         semesters=semesters,
+                         course_levels=course_levels,
+                         form=form,
+                         search=search,
+                         semester=semester,
+                         level=level,
+                         sort=sort,
+                         sort_dir=sort_dir)
 
 def get_allowed_course_levels(student_level):
     """Determine which course levels a student can take based on their academic level"""
@@ -182,13 +283,14 @@ def get_current_semester():
     else:
         return Semester.Summer
 
-@students.route('/student/register-course', methods=['POST'])
+@students.route('/student/register_course', methods=['POST'])
 def register_course():
     if 'student_id' not in session:
         flash('You must be logged in to register for a course.', 'error')
         return redirect(url_for('auth.login'))
 
     schedule_id = request.form.get('schedule_id')
+    print(f"Debug: schedule_id={schedule_id}, student_id={session.get('student_id')}")
 
     try:
         student = Student.query.get(session['student_id'])
@@ -196,7 +298,7 @@ def register_course():
             flash('Student not found.', 'error')
             return redirect(url_for('students.available_courses'))
 
-        # Check if already enrolled
+        # Check if already enrolled - using the shared session
         existing_enrollment = Enrolled.query.filter_by(
             student_id=session['student_id'],
             schedule_id=schedule_id
@@ -204,7 +306,6 @@ def register_course():
 
         if existing_enrollment:
             if existing_enrollment.status == EnrollmentStatus.dropped:
-                # Allow re-registration by updating the status
                 existing_enrollment.status = EnrollmentStatus.enrolled
                 db.session.commit()
                 flash('Successfully re-registered for the course.', 'success')
@@ -212,13 +313,54 @@ def register_course():
             flash('You are already enrolled in this course.', 'error')
             return redirect(url_for('students.available_courses'))
 
-        # Get course and schedule information
+        # Get course and schedule information - using the shared session
         schedule = Schedule.query.get(schedule_id)
         if not schedule:
             flash('Course schedule not found.', 'error')
             return redirect(url_for('students.available_courses'))
 
-        # Create new enrollment
+        # Prerequisite check
+        course = schedule.course
+        prerequisites = course.prerequisites.all() if hasattr(course.prerequisites, 'all') else course.prerequisites
+        missing_prereqs = []
+        for prereq in prerequisites:
+            completed = any(
+                e.schedule.course.course_id == prereq.course_id and e.status == EnrollmentStatus.completed
+                for e in student.enrollments
+            )
+            if not completed:
+                missing_prereqs.append(prereq.course_code)
+        if missing_prereqs:
+            flash(f"Cannot register: Missing prerequisite(s): {', '.join(missing_prereqs)}.", 'error')
+            return redirect(url_for('students.available_courses'))
+
+        # Schedule conflict check
+        new_days = set(schedule.meeting_days)
+        new_start = schedule.start_time
+        new_end = schedule.end_time
+        current_enrollments = Enrolled.query.filter_by(
+            student_id=session['student_id'],
+            status=EnrollmentStatus.enrolled
+        ).all()
+        for enrollment in current_enrollments:
+            other_schedule = enrollment.schedule
+            overlap_days = new_days.intersection(set(other_schedule.meeting_days))
+            if overlap_days:
+                if (new_start < other_schedule.end_time and new_end > other_schedule.start_time):
+                    flash(
+                        f"Schedule conflict with {other_schedule.course.course_code} on {', '.join(overlap_days)} "
+                        f"({other_schedule.start_time.strftime('%H:%M')}-{other_schedule.end_time.strftime('%H:%M')})",
+                        'error'
+                    )
+                    return redirect(url_for('students.available_courses'))
+
+        # Check if the course has reached maximum enrollment
+        enrolled_count = sum(1 for e in schedule.enrollments if e.status == EnrollmentStatus.enrolled)
+        if enrolled_count >= schedule.max_enrollment:
+            flash('Cannot register: The course has reached its maximum enrollment.', 'error')
+            return redirect(url_for('students.available_courses'))
+
+        # Create new enrollment within the same transaction
         enrollment = Enrolled(
             student_id=session['student_id'],
             schedule_id=schedule_id,
@@ -228,26 +370,31 @@ def register_course():
 
         db.session.add(enrollment)
         db.session.commit()
+        print(f"Debug: Enrollment created for schedule_id={schedule_id}")
 
         flash('Course registered successfully.', 'success')
         return redirect(url_for('students.dashboard'))
 
     except Exception as e:
         db.session.rollback()
-        flash(f'Error registering for the course: {str(e)}', 'error')
+        error_message = str(e)
+        print(f"Error: {error_message}")
+        if 'Cannot enroll: Course has reached maximum enrollment' in error_message:
+            flash('Cannot register: The course has reached its maximum enrollment.', 'error')
+        else:
+            flash(f'Error registering for the course: {error_message}', 'error')
         return redirect(url_for('students.available_courses'))
 
-@students.route('/student/drop-course', methods=['POST'])
+@students.route('/student/drop_course', methods=['POST'])
 def drop_course():
+    print(f"Debug: Request form data: {request.form}")
+
     if 'student_id' not in session:
         flash('You must be logged in to drop a course.', 'error')
         return redirect(url_for('auth.login'))
 
     enrollment_id = request.form.get('enrollment_id')
-
-    if not enrollment_id:
-        flash('Enrollment ID is required to drop a course.', 'error')
-        return redirect(url_for('students.dashboard'))
+    print(f"Debug: enrollment_id={enrollment_id}, student_id={session.get('student_id')}")
 
     try:
         enrollment = Enrolled.query.filter_by(
@@ -259,20 +406,22 @@ def drop_course():
             flash('Enrollment not found.', 'error')
             return redirect(url_for('students.dashboard'))
 
-        # Check if it's within the drop period (you can add your own logic here)
         if enrollment.status != EnrollmentStatus.enrolled:
             flash('Cannot drop this course at this time.', 'error')
             return redirect(url_for('students.dashboard'))
 
         enrollment.status = EnrollmentStatus.dropped
         db.session.commit()
+        print(f"Debug: Enrollment {enrollment_id} status updated to dropped.")
 
         flash('Course successfully dropped.', 'success')
         return redirect(url_for('students.dashboard'))
 
     except Exception as e:
         db.session.rollback()
-        flash(f'Error dropping the course: {str(e)}', 'error')
+        error_message = str(e)
+        print(f"Error: {error_message}")
+        flash(f'Error dropping the course: {error_message}', 'error')
         return redirect(url_for('students.dashboard'))
 
 @students.route('/check-level-upgrade')
@@ -325,4 +474,7 @@ def schedule():
         status=EnrollmentStatus.enrolled
     ).all()
 
-    return render_template('student/schedule.html', enrollments=current_enrollments)
+    # Initialize a dummy form for CSRF protection
+    form = StudentForm()
+
+    return render_template('student/schedule.html', enrollments=current_enrollments, form=form)

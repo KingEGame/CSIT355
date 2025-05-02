@@ -76,16 +76,24 @@
                                             Room {{ schedule.room_number }}
                                         </div>
                                         <div class="col-auto d-flex align-items-center small text-muted">
-                                            <svg class="icon-md text-muted me-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg>
-                                            {{ schedule.current_enrollment }}/{{ schedule.max_enrollment }} enrolled
+                                            <svg class="icon-md text-muted me-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+                                            {% set enrolled_count = schedule.enrollments | selectattr('status', 'equalto', 'enrolled') | list | length %}
+                                            {{ enrolled_count }}/{{ schedule.max_enrollment }} enrolled
+                                        </div>
+                                        <div class="col-auto d-flex align-items-center small text-muted">
+                                            <svg class="icon-md text-muted me-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M12 8c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm-2 8c-4.41 0-8-1.79-8-4V6c0-2.21 3.59-4 8-4s8 1.79 8 4v6c0 2.21-3.59 4-8 4z"/>
+                                            </svg>
+                                            {{ schedule.course.credits }} credits
                                         </div>
                                     </div>
                                 </div>
                                 <div class="ms-3 flex-shrink-0">
-                                    {% if schedule.current_enrollment >= schedule.max_enrollment %}
+                                    {% if enrolled_count >= schedule.max_enrollment %}
                                     <span class="badge bg-danger bg-opacity-10 text-danger">Full</span>
                                     {% else %}
                                     <form action="{{ url_for('students.register_course') }}" method="POST">
+                                        {{ form.hidden_tag() }}
                                         <input type="hidden" name="schedule_id" value="{{ schedule.schedule_id }}">
                                         <button type="submit" class="btn btn-primary btn-sm">Register</button>
                                     </form>
@@ -94,6 +102,10 @@
                             </div>
                             <div class="mt-2">
                                 <p class="small text-muted mb-0">{{ schedule.course.description }}</p>
+                                {% set prereqs = schedule.course.prerequisites.all() if schedule.course.prerequisites and schedule.course.prerequisites.all is not none else schedule.course.prerequisites %}
+                                {% if prereqs and prereqs|length > 0 %}
+                                    <p class="small text-warning mb-0">Prerequisites: {{ prereqs|map(attribute='course_code')|join(', ') }}</p>
+                                {% endif %}
                             </div>
                             <div class="mt-2">
                                 <span class="badge bg-primary bg-opacity-10 text-primary me-2">{{ schedule.semester }}</span>

@@ -6,18 +6,10 @@ Admin
 -admin role need teaching assingments
 -bugs on admin manage students page
 
-Courses
--search for course name - ILIAN
-    search implement    - ILIAN
--prerequisite display
--no course prerequisite on course enrollment
--duplicate enrollment verification
--schedule conflict resolution
--TokenValidation for course enroll - ILIAN
--populate academic history page
-    previous semester classes display
+Professor implement teacher teaching load
 
-==================================================================
+populate academic history page
+
 LAST THING 
     Download backup of whole database when everytyhing else done
 
