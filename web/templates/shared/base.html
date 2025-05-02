@@ -32,8 +32,8 @@
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('professors.courses') }}">My Courses</a></li>
                     {% elif session.get('user_type') == 'admin' %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.users') }}">Users</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.courses') }}">Courses</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.add_course') }}">Add Course</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.course_list') }}">Courses</a></li>
                     {% endif %}
                     {% if session.get('user_id') and session.get('user_type') %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "shared/base.html" %}
 
 {% block title %}Student Dashboard{% endblock %}
 
@@ -15,7 +15,7 @@
         <div class="row g-3 mb-4">
             <div class="bg-white shadow-sm rounded p-3 d-flex flex-column align-items-center">
                 <span class="small text-muted">Total Credits</span>
-                <span class="fs-4 fw-bold text-primary">{{ total_credits }}</span>
+                <span class="fs-4 fw-bold text-primary">{{ student.total_credits }}</span>
             </div>
             <div class="bg-white shadow-sm rounded p-3 d-flex flex-column align-items-center">
                 <span class="small text-muted">Current Courses</span>

@@ -33,19 +33,35 @@ def login():
 
         if user_type == 'student':
             student = Student.query.get(user_id)
-            if student and student.status == StudentStatus.active:
-                login_user(student)
-                session['user_type'] = 'student'
-                return redirect(url_for('students.dashboard'))
-            flash('Invalid student ID or inactive account', 'error')
+            if not student:
+                flash('Student not found', 'error')
+                return redirect(url_for('auth.login'))
+
+            if student.status != StudentStatus.active:
+                flash('Student account is not active', 'error')
+                return redirect(url_for('auth.login'))
+
+            login_user(student)
+            session['user_type'] = 'student'
+            session['student_id'] = student.student_id  # Add student_id to session
+            print(f"Session after student login: {session}")  # Debug log
+            return redirect(url_for('students.dashboard'))
 
         elif user_type == 'professor':
             professor = Professor.query.get(user_id)
-            if professor and professor.status == ProfessorStatus.active:
-                login_user(professor)
-                session['user_type'] = 'professor'
-                return redirect(url_for('professors.dashboard'))
-            flash('Invalid professor ID or inactive account', 'error')
+            if not professor:
+                flash('Professor not found', 'error')
+                return redirect(url_for('auth.login'))
+
+            if professor.status != ProfessorStatus.active:
+                flash('Professor account is not active', 'error')
+                return redirect(url_for('auth.login'))
+
+            login_user(professor)
+            session['user_type'] = 'professor'
+            session['professor_id'] = professor.professor_id  # Add professor_id to session
+            print(f"Session after professor login: {session}")  # Debug log
+            return redirect(url_for('professors.dashboard'))
 
         elif user_type == 'admin':
             if user_id == 'admin':

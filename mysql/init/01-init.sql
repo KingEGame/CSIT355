@@ -25,8 +25,7 @@ CREATE TABLE student (
     total_credits INT DEFAULT 0 NOT NULL,
     INDEX idx_student_email (email),
     INDEX idx_student_status (status),
-    CONSTRAINT student_email_format_check CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'),
-    CONSTRAINT chk_student_dob CHECK (date_of_birth <= CURRENT_DATE - INTERVAL 16 YEAR)
+    CONSTRAINT student_email_format_check CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
 );
 
 -- Create professor table 
@@ -60,35 +59,33 @@ CREATE TABLE courses (
     CONSTRAINT chk_course_capacity CHECK (max_capacity BETWEEN 5 AND 300)
 );
 
--- Create prerequisite table 
+-- Removed the problematic CHECK constraint for no_self_prerequisite
 CREATE TABLE prerequisite (
     prerequisite_id INT AUTO_INCREMENT PRIMARY KEY,
     course_id VARCHAR(10) NOT NULL,
     prerequisite_course_id VARCHAR(10) NOT NULL,
     UNIQUE KEY unique_prerequisite (course_id, prerequisite_course_id),
     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (prerequisite_course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT no_self_prerequisite CHECK (course_id != prerequisite_course_id)
+    FOREIGN KEY (prerequisite_course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Create schedule table 
+-- Removed invalid Python ORM code mistakenly included in the SQL file
 CREATE TABLE schedule (
     schedule_id VARCHAR(10) PRIMARY KEY,
     course_id VARCHAR(10) NOT NULL,
     semester ENUM('Fall', 'Spring', 'Summer') NOT NULL,
+    academic_year INT NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     meeting_days VARCHAR(10) NOT NULL,
     room_number VARCHAR(10) NOT NULL,
-    academic_year INT NOT NULL,
-    max_enrollment INT NOT NULL,
     current_enrollment INT DEFAULT 0,
+    max_enrollment INT NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE ON UPDATE CASCADE,
     INDEX idx_schedule_semester (semester, academic_year),
     CONSTRAINT chk_schedule_time CHECK (start_time < end_time),
     CONSTRAINT chk_schedule_days CHECK (meeting_days REGEXP '^[MTWRF]+$'),
-    CONSTRAINT chk_current_enrollment CHECK (current_enrollment <= max_enrollment),
-    CONSTRAINT chk_academic_year CHECK (academic_year >= YEAR(CURRENT_DATE))
+    CONSTRAINT chk_current_enrollment CHECK (current_enrollment <= max_enrollment)
 );
 
 -- Create enrolled table 
