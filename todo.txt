@@ -1,5 +1,4 @@
 Student 
--implement courses to completion before_student_update
 -implement student_email_format_check
 
 Admin
