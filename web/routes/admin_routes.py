@@ -3,6 +3,7 @@ from ..models import db, Course, Professor, Schedule, Teaching, CourseLevel, Sem
 from datetime import datetime
 from web.models import Student
 from web.forms import StudentForm, ProfessorForm, CourseForm
+from flask_wtf.csrf import generate_csrf
 
 admin = Blueprint('admin', __name__)
 
@@ -195,7 +196,8 @@ def student_list():
                            students=students,
                            student_statuses=student_statuses,
                            majors=majors,
-                           pagination=pagination)
+                           pagination=pagination,
+                           csrf_token=generate_csrf())
 
 @admin.route('/admin/students/add', methods=['GET', 'POST'])
 def add_student():
@@ -245,7 +247,8 @@ def professor_list():
     return render_template('admin/professor_list.html',
                            professors=professors,
                            departments=departments,
-                           pagination=pagination)
+                           pagination=pagination,
+                           csrf_token=generate_csrf())
 
 @admin.route('/admin/professors/add', methods=['GET', 'POST'])
 def add_professor():
@@ -256,11 +259,27 @@ def add_professor():
 def edit_professor(professor_id):
     professor = Professor.query.get_or_404(professor_id)
     form = ProfessorForm(obj=professor)
+    form.professor = professor  # Ensure correct email validation
+    if form.validate_on_submit():
+        form.populate_obj(professor)
+        db.session.commit()
+        flash('Professor updated successfully!', 'success')
+        return redirect(url_for('admin.professor_list'))
     return render_template('admin/professor_form.html', form=form, professor=professor)
 
 @admin.route('/admin/professors/<professor_id>/delete', methods=['POST'])
 def delete_professor(professor_id):
-    flash(f'Delete professor {professor_id} (not implemented)', 'warning')
+    professor = Professor.query.get_or_404(professor_id)
+    try:
+        # Delete all teaching assignments for this professor
+        for teaching in list(professor.teaching_assignments):
+            db.session.delete(teaching)
+        db.session.delete(professor)
+        db.session.commit()
+        flash('Professor deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting professor: {str(e)}', 'error')
     return redirect(url_for('admin.professor_list'))
 
 @admin.route('/admin/courses/add', methods=['GET', 'POST'])
@@ -309,13 +328,24 @@ def teaching_assignments():
 
 @admin.route('/admin/students/<student_id>/delete', methods=['POST'])
 def delete_student(student_id):
-    flash(f'Delete student {student_id} (not implemented)', 'warning')
+    student = Student.query.get_or_404(student_id)
+    try:
+        # Delete all enrollments for this student
+        for enrollment in list(student.enrollments):
+            db.session.delete(enrollment)
+        db.session.delete(student)
+        db.session.commit()
+        flash('Student deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting student: {str(e)}', 'error')
     return redirect(url_for('admin.student_list'))
 
 @admin.route('/admin/students/<student_id>/edit', methods=['GET', 'POST'])
 def edit_student(student_id):
     student = Student.query.get_or_404(student_id)
     form = StudentForm(obj=student)
+    form.student = student  # Ensure correct email validation
     if form.validate_on_submit():
         student.first_name = form.first_name.data
         student.last_name = form.last_name.data

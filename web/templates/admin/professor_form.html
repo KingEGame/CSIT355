@@ -69,16 +69,6 @@
                         {% endfor %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ form.password.label.text }}</label>
-                        {{ form.password(class="form-control") }}
-                        {% for error in form.password.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                        {% if professor %}
-                            <div class="form-text">Leave blank to keep current password</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label">{{ form.department.label.text }}</label>
                         {{ form.department(class="form-control") }}
                         {% for error in form.department.errors %}
@@ -95,6 +85,13 @@
                         {% endif %}
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label">{{ form.office_number.label.text }}</label>
+                        {{ form.office_number(class="form-control") }}
+                        {% for error in form.office_number.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label">{{ form.phone.label.text }}</label>
                         {{ form.phone(class="form-control") }}
                         {% for error in form.phone.errors %}
@@ -109,14 +106,54 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="mt-3">
-                    <label class="form-label">{{ form.office_hours.label.text }}</label>
-                    {{ form.office_hours(class="form-control", rows="3") }}
-                    {% for error in form.office_hours.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                    {% endfor %}
-                    <div class="form-text">Brief description of office hours schedule.</div>
+                <div class="mb-3">
+                    <label class="form-label">Office Hours</label>
+                    <div class="row">
+                        {% for day, field in [
+                            ('Monday', form.office_hours_monday),
+                            ('Tuesday', form.office_hours_tuesday),
+                            ('Wednesday', form.office_hours_wednesday),
+                            ('Thursday', form.office_hours_thursday),
+                            ('Friday', form.office_hours_friday)
+                        ] %}
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label">{{ day }}</label>
+                            <div id="{{ day|lower }}-times">
+                                {% for subform in field %}
+                                <div class="input-group mb-2">
+                                    {{ subform.time(class="form-control", placeholder="e.g. 10:00-12:00") }}
+                                    <button type="button" class="btn btn-danger remove-time">Remove</button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-secondary add-time" data-day="{{ day|lower }}">Add Time Slot</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-text">For each day, add one or more time slots (e.g., 10:00-12:00, 14:00-16:00).</div>
                 </div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.add-time').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            var day = btn.getAttribute('data-day');
+                            var container = document.getElementById(day + '-times');
+                            var index = container.querySelectorAll('.input-group').length;
+                            var name = 'office_hours_' + day + '-' + index + '-time';
+                            var html = `<div class="input-group mb-2">
+                                <input class="form-control" name="${name}" placeholder="e.g. 10:00-12:00">
+                                <button type="button" class="btn btn-danger remove-time">Remove</button>
+                            </div>`;
+                            container.insertAdjacentHTML('beforeend', html);
+                        });
+                    });
+                    document.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('remove-time')) {
+                            e.target.closest('.input-group').remove();
+                        }
+                    });
+                });
+                </script>
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary">
                         {% if professor %}

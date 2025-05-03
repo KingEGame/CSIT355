@@ -178,7 +178,7 @@
       </div>
       <div class="modal-footer">
         <form id="deleteForm" method="POST">
-          <input type="hidden" name="_method" value="DELETE">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
           <button type="submit" class="btn btn-danger">Delete</button>
         </form>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -191,7 +191,7 @@
 function confirmDelete(professorId) {
     var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     var form = document.getElementById('deleteForm');
-    form.action = "{{ url_for('admin.delete_professor', professor_id='') }}" + professorId;
+    form.action = "{{ url_for('admin.delete_professor', professor_id='PROF_ID_PLACEHOLDER') }}".replace('PROF_ID_PLACEHOLDER', professorId);
     modal.show();
 }
 </script>

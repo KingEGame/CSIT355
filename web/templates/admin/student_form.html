@@ -69,16 +69,6 @@
                         {% endfor %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ form.password.label.text }}</label>
-                        {{ form.password(class="form-control") }}
-                        {% for error in form.password.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                        {% if student %}
-                            <div class="form-text">Leave blank to keep current password</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label">{{ form.major.label.text }}</label>
                         {{ form.major(class="form-control") }}
                         {% for error in form.major.errors %}

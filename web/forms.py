@@ -60,7 +60,7 @@ class StudentForm(FlaskForm):
     def validate_email(self, field):
         student = Student.query.filter_by(email=field.data).first()
         if student:
-            if not hasattr(self, 'student') or student.id != self.student.id:
+            if not hasattr(self, 'student') or student.student_id != self.student.student_id:
                 raise ValidationError('Email already registered.')
 
 class ProfessorForm(FlaskForm):
@@ -117,7 +117,7 @@ class ProfessorForm(FlaskForm):
     def validate_email(self, field):
         professor = Professor.query.filter_by(email=field.data).first()
         if professor:
-            if not hasattr(self, 'professor') or professor.id != self.professor.id:
+            if not hasattr(self, 'professor') or professor.professor_id != self.professor.professor_id:
                 raise ValidationError('Email already registered.')
 
 class CourseForm(FlaskForm):

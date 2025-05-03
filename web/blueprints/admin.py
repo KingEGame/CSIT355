@@ -108,6 +108,7 @@ def add_student():
 def edit_student(student_id):
     student = Student.query.get_or_404(student_id)
     form = StudentForm(obj=student)
+    form.student = student  # Ensure correct email validation
 
     if form.validate_on_submit():
         student.first_name = form.first_name.data
@@ -264,6 +265,7 @@ def add_professor():
 def edit_professor(professor_id):
     professor = Professor.query.get_or_404(professor_id)
     form = ProfessorForm(obj=professor)
+    form.professor = professor  # Ensure correct email validation
 
     if form.validate_on_submit():
         professor.first_name = form.first_name.data
