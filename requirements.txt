@@ -8,3 +8,4 @@ Werkzeug==2.3.7
 cryptography==41.0.4
 email-validator==2.0.0
 flask-migrate==4.0.4
+Flask-WTF
