@@ -183,3 +183,31 @@ class RegisterStudentForm(FlaskForm):
         Length(max=100, message='Email must be less than 100 characters')
     ])
     submit = SubmitField('Register')
+
+class RegisterProfessorForm(FlaskForm):
+    first_name = StringField('First Name', validators=[
+        DataRequired(),
+        Length(min=2, max=50, message='First name must be between 2 and 50 characters')
+    ])
+    last_name = StringField('Last Name', validators=[
+        DataRequired(),
+        Length(min=2, max=50, message='Last name must be between 2 and 50 characters')
+    ])
+    department = StringField('Department', validators=[
+        DataRequired(),
+        Length(max=50, message='Department must be less than 50 characters')
+    ])
+    email = EmailField('Email', validators=[
+        DataRequired(),
+        Email(message='Please enter a valid email address'),
+        Length(max=100, message='Email must be less than 100 characters')
+    ])
+    office_number = StringField('Office Number', validators=[
+        Optional(),
+        Length(max=20, message='Office number must be less than 20 characters')
+    ])
+    phone = StringField('Phone', validators=[
+        Optional(),
+        Length(max=20, message='Phone number must be less than 20 characters')
+    ])
+    submit = SubmitField('Register')

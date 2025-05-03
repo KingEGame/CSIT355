@@ -3,8 +3,10 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
-{% set required_credits = 120 if student.level.value == 'undergraduate' else 30 if student.level.value == 'graduate' else 60 %}
-{% set level_label = 'Undergraduate' if student.level.value == 'undergraduate' else 'Graduate' if student.level.value == 'graduate' else 'PhD' %}
+{% set required_credits = 120 if student.level.value == 'undergraduate' else 30 if student.level.value == 'graduate'
+else 60 %}
+{% set level_label = 'Undergraduate' if student.level.value == 'undergraduate' else 'Graduate' if student.level.value ==
+'graduate' else 'PhD' %}
 {% set progress_percent = (completed_credits / required_credits * 100) if required_credits else 0 %}
 <div class="container-fluid py-4">
     <div class="container">
@@ -39,8 +41,7 @@
         <div class="bg-white shadow-sm rounded mb-4 p-4">
             <h2 class="fs-5 fw-medium text-dark mb-3">Credit Progress ({{ level_label }})</h2>
             <div class="progress" style="height: 0.5rem;">
-                <div class="progress-bar bg-primary" role="progressbar"
-                    style="width: {{ progress_percent }}%"></div>
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ progress_percent }}%"></div>
             </div>
             <p class="mt-2 small text-muted">{{ completed_credits }}/{{ required_credits }} credits completed</p>
         </div>
@@ -167,6 +168,7 @@
                             <span class="small fw-medium">Schedule</span>
                         </a>
                     </div>
+                    <!--
                     <div class="col-6">
                         <a href="{{ url_for('students.profile') }}"
                             class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
@@ -177,7 +179,7 @@
                             </svg>
                             <span class="small fw-medium">Profile Settings</span>
                         </a>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>

@@ -68,7 +68,8 @@
                         <td>{{ course.course_code }}</td>
                         <td>{{ course.course_name }}</td>
                         <td>
-                            {{ course.current_enrollment if course.current_enrollment is defined else 0 }}/{{ course.max_capacity if course.max_capacity is defined else '' }}
+                            {{ course.current_enrollment if course.current_enrollment is defined else 0 }}/{{
+                            course.max_capacity if course.max_capacity is defined else '' }}
                         </td>
                         <td>
                             <a href="{{ url_for('professors.view_course', schedule_id=course.schedule_id) }}"
@@ -94,10 +95,12 @@
             <a href="{{ url_for('professors.course_management') }}" class="btn btn-outline-primary w-100 mb-3">Course
                 Management</a>
         </div>
+        <!--
         <div class="col-md-4">
             <a href="{{ url_for('professors.profile') }}" class="btn btn-outline-primary w-100 mb-3">Profile
                 Settings</a>
         </div>
+        -->
     </div>
 </div>
 {% endblock %}

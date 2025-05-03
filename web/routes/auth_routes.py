@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from ..models import db, Student, Professor, StudentStatus, ProfessorStatus
 from datetime import datetime
 from flask_login import login_user, logout_user, current_user
-from ..forms import LoginForm, RegisterStudentForm
+from ..forms import LoginForm, RegisterStudentForm, RegisterProfessorForm
 import re
 
 auth = Blueprint('auth', __name__)
@@ -118,33 +118,38 @@ def register_student():
 
 def generate_next_professor_id():
     last_prof = Professor.query.order_by(Professor.professor_id.desc()).first()
-    if last_prof and re.match(r"PR\\d{3,}", last_prof.professor_id):
-        last_num = int(last_prof.professor_id[2:])
-        next_num = last_num + 1
+    if last_prof:
+        try:
+            last_num = int(re.search(r"\d+", last_prof.professor_id).group())
+            next_num = last_num + 1
+        except (ValueError, AttributeError):
+            next_num = 1
     else:
         next_num = 1
     return f"PR{next_num:03d}"
 
 @auth.route('/register/professor', methods=['GET', 'POST'])
 def register_professor():
-    if request.method == 'POST':
+    form = RegisterProfessorForm()
+    if request.method == 'POST' and form.validate_on_submit():
         try:
             new_professor_id = generate_next_professor_id()
             professor = Professor(
                 professor_id=new_professor_id,
-                first_name=request.form['first_name'],
-                last_name=request.form['last_name'],
-                department=request.form['department'],
-                email=request.form['email'],
-                office_number=request.form['office_number'],
-                phone=request.form['phone'],
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                department=form.department.data,
+                email=form.email.data,
+                office_number=form.office_number.data,
+                phone=form.phone.data,
                 hire_date=datetime.utcnow()
             )
             db.session.add(professor)
             db.session.commit()
+            flash(f'Registration successful! Your ID is {new_professor_id}. Please login.', 'success')
             flash('Registration successful! Please login.', 'success')
             return redirect(url_for('auth.login'))
         except Exception as e:
             db.session.rollback()
             flash(f'Registration failed: {str(e)}', 'error')
-    return render_template('auth/register_professor.html')
+    return render_template('auth/register_professor.html', form=form)
