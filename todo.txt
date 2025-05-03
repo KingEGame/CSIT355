@@ -1,5 +1,17 @@
-Student 
--implement student_email_format_check
+
+fix teaching view enrolled number
+
+TEACHER cannot edit
+    fix profile settings
+
+STUDENT cannot edit
+remove text field for student email in profile settings
+
+ADMIN cannot edit or delete
+    fix course edit on course manage page, field not populating, SQL query in prereq field
+    logout button
+    edit student says email already registered
+
 
 
 LAST THING 
