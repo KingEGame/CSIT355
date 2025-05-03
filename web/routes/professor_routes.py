@@ -264,7 +264,7 @@ def view_course(schedule_id):
         return redirect(url_for('professors.dashboard'))
 
     # Fetch enrolled students
-    enrollments = Enrolled.query.filter_by(schedule_id=schedule_id).all()
+    enrollments = Enrolled.query.filter_by(schedule_id=schedule_id, status='enrolled').all()
 
     return render_template('professor/course_details.html', schedule=schedule, enrollments=enrollments)
 
